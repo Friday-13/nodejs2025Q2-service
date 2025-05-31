@@ -6,6 +6,6 @@ export interface IUserStorage {
   getAll: () => User[];
   getById: (id: string) => User | null;
   create: (dto: CreateUserDto) => User;
-  updatePassword: (id: string, dto: UpdatePasswordDto) => User | null;
-  remove: (id: string) => boolean;
+  update: (id: string, dto: UpdatePasswordDto) => User | null;
+  delete: (id: string) => boolean;
 }

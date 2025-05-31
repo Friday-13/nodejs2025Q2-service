@@ -5,6 +5,12 @@ import { InMemoryUserStorage } from './store/user.storage';
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService, InMemoryUserStorage],
+  providers: [
+    UsersService,
+    {
+      provide: 'IUserStorage',
+      useClass: InMemoryUserStorage,
+    },
+  ],
 })
 export class UsersModule {}

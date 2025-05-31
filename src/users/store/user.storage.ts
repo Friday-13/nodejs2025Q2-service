@@ -19,26 +19,21 @@ export class InMemoryUserStorage implements IUserStorage {
   }
 
   create(dto: CreateUserDto) {
-    //TODO: need verify?
     const user: User = {
       id: randomUUID(),
       login: dto.login,
       password: dto.password,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      version: 0,
+      version: 1,
     };
     this.storage.push(user);
     return user;
   }
 
-  updatePassword(id: string, dto: UpdatePasswordDto) {
-    const user = this.storage.find((user) => user.id === id);
+  update(id: string, dto: UpdatePasswordDto) {
+    const user = this.getById(id);
     if (!user) {
-      return null;
-    }
-    if (user.password !== dto.oldPassword) {
-      //TODO: throw error
       return null;
     }
     user.password = dto.newPassword;
@@ -47,7 +42,7 @@ export class InMemoryUserStorage implements IUserStorage {
     return user;
   }
 
-  remove(id: string) {
+  delete(id: string) {
     const userIndex = this.storage.findIndex((user) => user.id === id);
     if (userIndex < 0) {
       return false;

@@ -6,12 +6,16 @@ import {
   Param,
   Delete,
   Put,
+  ParseUUIDPipe,
+  NotFoundException,
+  HttpCode,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user-password.dto';
 
-@Controller('users')
+@Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -21,25 +25,43 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
+  getAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  getById(@Param('id', ParseUUIDPipe) id: string) {
+    const user = this.usersService.getById(id);
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} doesn't exist`);
+    }
+    return user;
   }
 
   @Put(':id')
-  updatePassword(
-    @Param('id') id: string,
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
-    return this.usersService.updatePassword(id, updatePasswordDto);
+    try {
+      const user = this.usersService.update(id, updatePasswordDto);
+      return user;
+    } catch (err) {
+      if (err.message === 'USER_NOT_FOUND') {
+        throw new NotFoundException(`User with id ${id} doesn't exist`);
+      }
+      if (err.message === 'INVALID_OLD_PASSWORD') {
+        throw new ForbiddenException('Old password is incorrect');
+      }
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    this.usersService.remove(id);
+  @HttpCode(204)
+  delete(@Param('id', ParseUUIDPipe) id: string) {
+    const isSuccess = this.usersService.delete(id);
+    if (!isSuccess) {
+      throw new NotFoundException(`User with id ${id} doesn't exist`);
+    }
   }
 }
