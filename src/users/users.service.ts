@@ -3,6 +3,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user-password.dto';
 import { IUserStorage } from './interfaces/user-storage.interface';
 import { ResponseUserDto } from './dto/response-user.dto';
+import { UserDoesntExist } from './errors/user-doesnt-exist.error';
+import InvalidCredentials from './errors/invalid-credentials.error';
 
 @Injectable()
 export class UsersService {
@@ -28,16 +30,20 @@ export class UsersService {
   }
 
   async getById(id: string) {
-    return await this.storage.getById(id);
+    const user = await this.storage.getById(id);
+    if (!user) {
+      throw new UserDoesntExist(id);
+    }
+    return user;
   }
 
   async update(id: string, updatePasswordDto: UpdatePasswordDto) {
     const user = await this.storage.getById(id);
     if (!user) {
-      throw new Error('USER_NOT_FOUND');
+      throw new UserDoesntExist(id);
     }
     if (user.password !== updatePasswordDto.oldPassword) {
-      throw new Error('INVALID_OLD_PASSWORD');
+      throw new InvalidCredentials('Old password');
     }
     const updatedUser = await this.storage.update(id, updatePasswordDto);
     const withoutPasswordUser: ResponseUserDto = {
@@ -51,6 +57,9 @@ export class UsersService {
   }
 
   async delete(id: string) {
-    return await this.storage.delete(id);
+    const result = await this.storage.delete(id);
+    if (!result) {
+      throw new UserDoesntExist(id);
+    }
   }
 }

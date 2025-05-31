@@ -14,6 +14,8 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user-password.dto';
+import { UserDoesntExist } from './errors/user-doesnt-exist.error';
+import InvalidCredentials from './errors/invalid-credentials.error';
 
 @Controller('user')
 export class UsersController {
@@ -31,11 +33,14 @@ export class UsersController {
 
   @Get(':id')
   async getById(@Param('id', ParseUUIDPipe) id: string) {
-    const user = await this.usersService.getById(id);
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} doesn't exist`);
+    try {
+      const user = await this.usersService.getById(id);
+      return user;
+    } catch (err) {
+      if (err instanceof UserDoesntExist) {
+        throw new NotFoundException(err.message);
+      }
     }
-    return user;
   }
 
   @Put(':id')
@@ -47,11 +52,11 @@ export class UsersController {
       const user = await this.usersService.update(id, updatePasswordDto);
       return user;
     } catch (err) {
-      if (err.message === 'USER_NOT_FOUND') {
-        throw new NotFoundException(`User with id ${id} doesn't exist`);
+      if (err instanceof UserDoesntExist) {
+        throw new NotFoundException(err.message);
       }
-      if (err.message === 'INVALID_OLD_PASSWORD') {
-        throw new ForbiddenException('Old password is incorrect');
+      if (err instanceof InvalidCredentials) {
+        throw new ForbiddenException(err.message);
       }
       throw err;
     }
@@ -60,9 +65,12 @@ export class UsersController {
   @Delete(':id')
   @HttpCode(204)
   async delete(@Param('id', ParseUUIDPipe) id: string) {
-    const isSuccess = await this.usersService.delete(id);
-    if (!isSuccess) {
-      throw new NotFoundException(`User with id ${id} doesn't exist`);
+    try {
+      await this.usersService.delete(id);
+    } catch (err) {
+      if (err instanceof UserDoesntExist) {
+        throw new NotFoundException(err.message);
+      }
     }
   }
 }
