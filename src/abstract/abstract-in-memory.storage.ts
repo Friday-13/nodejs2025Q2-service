@@ -18,6 +18,10 @@ export abstract class InMemoryAbstractStorage<
     return this.storage.find((record) => record.id === id) || null;
   }
 
+  async filterByIds(ids: string[]) {
+    return this.storage.filter((item) => ids.includes(item.id));
+  }
+
   abstract create(dto: CreateDto): Promise<Entity>;
 
   abstract update(id: string, dto: UpdateDto): Promise<Entity | null>;

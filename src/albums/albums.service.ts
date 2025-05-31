@@ -15,6 +15,10 @@ export class AlbumsService {
     return await this.storage.getAll();
   }
 
+  async filterByIds(ids: string[]) {
+    return await this.storage.filterByIds(ids);
+  }
+
   async getById(id: string) {
     const album = await this.storage.getById(id);
     if (!album) {

@@ -15,6 +15,10 @@ export class ArtistsService {
     return await this.storage.getAll();
   }
 
+  async filterByIds(ids: string[]) {
+    return await this.storage.filterByIds(ids);
+  }
+
   async getById(id: string) {
     const artist = await this.storage.getById(id);
     if (!artist) {

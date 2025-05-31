@@ -15,10 +15,14 @@ export class TracksService {
     return await this.storage.getAll();
   }
 
+  async filterByIds(ids: string[]) {
+    return await this.storage.filterByIds(ids);
+  }
+
   async getById(id: string) {
     const track = await this.storage.getById(id);
     if (!track) {
-      throw new NotFoundException(`Track with id ${id} doesn't exist`);
+      throw new TrackDoesntExist(id);
     }
     return track;
   }
