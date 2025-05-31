@@ -53,6 +53,7 @@ export class UsersController {
       if (err.message === 'INVALID_OLD_PASSWORD') {
         throw new ForbiddenException('Old password is incorrect');
       }
+      throw err;
     }
   }
 
