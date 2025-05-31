@@ -1,11 +1,7 @@
+import { IAbstractStorage } from 'src/abstract/abstract-storage.interface';
+import { Track } from '../entities/track.entity';
 import { CreateTrackDto } from '../dto/create-track.dto';
 import { UpdateTrackDto } from '../dto/update-track.dto';
-import { Track } from '../entities/track.entity';
 
-export interface ITrackStorage {
-  getAll: () => Promise<Track[]>;
-  getById: (id: string) => Promise<Track | null>;
-  create: (dto: CreateTrackDto) => Promise<Track>;
-  update: (id: string, dto: UpdateTrackDto) => Promise<Track | null>;
-  delete: (id: string) => Promise<boolean>;
-}
+export interface ITrackStorage
+  extends IAbstractStorage<Track, CreateTrackDto, UpdateTrackDto> {}
