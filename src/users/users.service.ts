@@ -8,8 +8,8 @@ import { ResponseUserDto } from './dto/response-user.dto';
 export class UsersService {
   constructor(@Inject('IUserStorage') private storage: IUserStorage) {}
 
-  create(dto: CreateUserDto): ResponseUserDto {
-    const user = this.storage.create(dto);
+  async create(dto: CreateUserDto): Promise<ResponseUserDto> {
+    const user = await this.storage.create(dto);
     if (!user) {
       return null;
     }
@@ -23,23 +23,23 @@ export class UsersService {
     return withoutPasswordUser;
   }
 
-  findAll() {
-    return this.storage.getAll();
+  async findAll() {
+    return await this.storage.getAll();
   }
 
-  getById(id: string) {
-    return this.storage.getById(id);
+  async getById(id: string) {
+    return await this.storage.getById(id);
   }
 
-  update(id: string, updatePasswordDto: UpdatePasswordDto) {
-    const user = this.storage.getById(id);
+  async update(id: string, updatePasswordDto: UpdatePasswordDto) {
+    const user = await this.storage.getById(id);
     if (!user) {
       throw new Error('USER_NOT_FOUND');
     }
     if (user.password !== updatePasswordDto.oldPassword) {
       throw new Error('INVALID_OLD_PASSWORD');
     }
-    const updatedUser = this.storage.update(id, updatePasswordDto);
+    const updatedUser = await this.storage.update(id, updatePasswordDto);
     const withoutPasswordUser: ResponseUserDto = {
       id: updatedUser.id,
       login: updatedUser.login,
@@ -50,7 +50,7 @@ export class UsersService {
     return withoutPasswordUser;
   }
 
-  delete(id: string) {
-    return this.storage.delete(id);
+  async delete(id: string) {
+    return await this.storage.delete(id);
   }
 }

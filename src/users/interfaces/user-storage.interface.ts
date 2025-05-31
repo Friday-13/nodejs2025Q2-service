@@ -1,11 +1,7 @@
+import { IAbstractStorage } from 'src/abstract/abstract-storage.interface';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdatePasswordDto } from '../dto/update-user-password.dto';
 import { User } from '../entities/user.entity';
 
-export interface IUserStorage {
-  getAll: () => User[];
-  getById: (id: string) => User | null;
-  create: (dto: CreateUserDto) => User;
-  update: (id: string, dto: UpdatePasswordDto) => User | null;
-  delete: (id: string) => boolean;
-}
+export interface IUserStorage
+  extends IAbstractStorage<User, CreateUserDto, UpdatePasswordDto> {}

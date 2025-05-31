@@ -1,24 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { IUserStorage } from '../interfaces/user-storage.interface';
 import { User } from '../entities/user.entity';
 import { randomUUID } from 'node:crypto';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdatePasswordDto } from '../dto/update-user-password.dto';
+import { InMemoryAbstractStorage } from 'src/abstract/abstract-in-memory.storage';
 
 @Injectable()
-export class InMemoryUserStorage implements IUserStorage {
-  private storage: User[] = [];
-  constructor() {}
-
-  getAll() {
-    return this.storage;
-  }
-
-  getById(id: string) {
-    return this.storage.find((user) => user.id === id) || null;
-  }
-
-  create(dto: CreateUserDto) {
+export class InMemoryUserStorage extends InMemoryAbstractStorage<
+  User,
+  CreateUserDto,
+  UpdatePasswordDto
+> {
+  async create(dto: CreateUserDto) {
     const user: User = {
       id: randomUUID(),
       login: dto.login,
@@ -31,8 +24,8 @@ export class InMemoryUserStorage implements IUserStorage {
     return user;
   }
 
-  update(id: string, dto: UpdatePasswordDto) {
-    const user = this.getById(id);
+  async update(id: string, dto: UpdatePasswordDto) {
+    const user = await this.getById(id);
     if (!user) {
       return null;
     }
@@ -40,14 +33,5 @@ export class InMemoryUserStorage implements IUserStorage {
     user.version += 1;
     user.updatedAt = Date.now();
     return user;
-  }
-
-  delete(id: string) {
-    const userIndex = this.storage.findIndex((user) => user.id === id);
-    if (userIndex < 0) {
-      return false;
-    }
-    this.storage.splice(userIndex, 1);
-    return true;
   }
 }

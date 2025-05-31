@@ -20,18 +20,18 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.create(createUserDto);
   }
 
   @Get()
-  getAll() {
-    return this.usersService.findAll();
+  async getAll() {
+    return await this.usersService.findAll();
   }
 
   @Get(':id')
-  getById(@Param('id', ParseUUIDPipe) id: string) {
-    const user = this.usersService.getById(id);
+  async getById(@Param('id', ParseUUIDPipe) id: string) {
+    const user = await this.usersService.getById(id);
     if (!user) {
       throw new NotFoundException(`User with id ${id} doesn't exist`);
     }
@@ -39,12 +39,12 @@ export class UsersController {
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
     try {
-      const user = this.usersService.update(id, updatePasswordDto);
+      const user = await this.usersService.update(id, updatePasswordDto);
       return user;
     } catch (err) {
       if (err.message === 'USER_NOT_FOUND') {
@@ -59,8 +59,8 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(204)
-  delete(@Param('id', ParseUUIDPipe) id: string) {
-    const isSuccess = this.usersService.delete(id);
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
+    const isSuccess = await this.usersService.delete(id);
     if (!isSuccess) {
       throw new NotFoundException(`User with id ${id} doesn't exist`);
     }
