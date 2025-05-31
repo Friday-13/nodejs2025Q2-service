@@ -6,49 +6,48 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
-  Put,
   NotFoundException,
   HttpCode,
+  Put,
 } from '@nestjs/common';
-import { TracksService } from './tracks.service';
-import { CreateTrackDto } from './dto/create-track.dto';
-import { UpdateTrackDto } from './dto/update-track.dto';
+import { ArtistsService } from './artists.service';
+import { CreateArtistDto } from './dto/create-artist.dto';
+import { UpdateArtistDto } from './dto/update-artist.dto';
 import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 
-@Controller('track')
-export class TracksController {
-  constructor(private readonly tracksService: TracksService) {}
+@Controller('artist')
+export class ArtistsController {
+  constructor(private readonly artistsService: ArtistsService) {}
 
   @Post()
-  async create(@Body() createTrackDto: CreateTrackDto) {
-    return await this.tracksService.create(createTrackDto);
+  async create(@Body() createArtistDto: CreateArtistDto) {
+    return await this.artistsService.create(createArtistDto);
   }
 
   @Get()
   async findAll() {
-    return await this.tracksService.findAll();
+    return await this.artistsService.findAll();
   }
 
   @Get(':id')
   async getById(@Param('id', ParseUUIDPipe) id: string) {
     try {
-      const track = await this.tracksService.getById(id);
-      return track;
+      const artist = await this.artistsService.getById(id);
+      return artist;
     } catch (err) {
       if (err instanceof RecordDoesntExist) {
         throw new NotFoundException(err.message);
       }
     }
-    return await this.tracksService.getById(id);
   }
 
   @Put(':id')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateTrackDto: UpdateTrackDto,
+    @Body() updateArtistDto: UpdateArtistDto,
   ) {
     try {
-      return await this.tracksService.update(id, updateTrackDto);
+      return await this.artistsService.update(id, updateArtistDto);
     } catch (err) {
       if (err instanceof RecordDoesntExist) {
         throw new NotFoundException(err.message);
@@ -61,7 +60,7 @@ export class TracksController {
   @HttpCode(204)
   async delete(@Param('id', ParseUUIDPipe) id: string) {
     try {
-      await this.tracksService.delete(id);
+      await this.artistsService.delete(id);
     } catch (err) {
       if (err instanceof RecordDoesntExist) {
         throw new NotFoundException(err.message);
