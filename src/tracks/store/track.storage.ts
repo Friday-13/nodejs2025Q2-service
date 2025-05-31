@@ -20,8 +20,8 @@ export class InMemoryTrackStorage implements ITrackStorage {
   async create(dto: CreateTrackDto) {
     const track: Track = {
       id: randomUUID(),
-      albumId: dto.albumId,
-      artistId: dto.artistId,
+      albumId: dto.albumId || null,
+      artistId: dto.artistId || null,
       duration: dto.duration,
       name: dto.name,
     };
@@ -43,7 +43,7 @@ export class InMemoryTrackStorage implements ITrackStorage {
   }
 
   async delete(id: string) {
-    const trackIndex = this.storage.findIndex((user) => user.id === id);
+    const trackIndex = this.storage.findIndex((track) => track.id === id);
     if (trackIndex < 0) {
       return false;
     }

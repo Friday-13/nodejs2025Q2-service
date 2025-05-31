@@ -3,13 +3,17 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  ParseUUIDPipe,
+  Put,
+  NotFoundException,
+  HttpCode,
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 
 @Controller('track')
 export class TracksController {
@@ -26,20 +30,35 @@ export class TracksController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return await this.tracksService.getById(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTrackDto: UpdateTrackDto,
   ) {
-    return await this.tracksService.update(id, updateTrackDto);
+    try {
+      return await this.tracksService.update(id, updateTrackDto);
+    } catch (err) {
+      if (err instanceof RecordDoesntExist) {
+        throw new NotFoundException(err.message);
+      }
+      throw err;
+    }
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
-    return await this.tracksService.delete(id);
+  @HttpCode(204)
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
+    try {
+      await this.tracksService.delete(id);
+    } catch (err) {
+      if (err instanceof RecordDoesntExist) {
+        throw new NotFoundException(err.message);
+      }
+      throw err;
+    }
   }
 }

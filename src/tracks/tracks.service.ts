@@ -1,7 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { ITrackStorage } from './interfaces/track-storage.interface';
+import TrackDoesntExist from './errors/track-doesnt-exist.error';
 
 @Injectable()
 export class TracksService {
@@ -15,14 +16,26 @@ export class TracksService {
   }
 
   async getById(id: string) {
-    return await this.storage.getById(id);
+    const track = await this.storage.getById(id);
+    if (!track) {
+      throw new NotFoundException(`Track with id ${id} doesn't exist`);
+    }
+    return track;
   }
 
   async update(id: string, updateTrackDto: UpdateTrackDto) {
-    return await this.storage.update(id, updateTrackDto);
+    const track = await this.storage.getById(id);
+    if (!track) {
+      throw new TrackDoesntExist(id);
+    }
+    const updatedTrack = await this.storage.update(id, updateTrackDto);
+    return updatedTrack;
   }
 
   async delete(id: string) {
-    return await this.storage.delete(id);
+    const result = await this.storage.delete(id);
+    if (!result) {
+      throw new TrackDoesntExist(id);
+    }
   }
 }
