@@ -5,6 +5,7 @@ import AlbumDoesntExist from './errors/album-doesnt-exist.error';
 import { IAlbumStorage } from './interfaces/album-storage.interfafce';
 import { FavoritesService } from 'src/favorites/favorites.service';
 import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
+import { TracksService } from 'src/tracks/tracks.service';
 
 @Injectable()
 export class AlbumsService {
@@ -13,6 +14,8 @@ export class AlbumsService {
 
     @Inject(forwardRef(() => FavoritesService))
     private favoritesService: FavoritesService,
+    @Inject(forwardRef(() => TracksService))
+    private tracksService: TracksService,
   ) {}
   async create(createAlbumDto: CreateAlbumDto) {
     return await this.storage.create(createAlbumDto);
@@ -24,6 +27,10 @@ export class AlbumsService {
 
   async filterByIds(ids: string[]) {
     return await this.storage.filterByIds(ids);
+  }
+
+  async filterByArtistId(id: string) {
+    return await this.storage.filterByArtistId(id);
   }
 
   async getById(id: string) {
@@ -48,6 +55,11 @@ export class AlbumsService {
     if (!result) {
       throw new AlbumDoesntExist(id);
     }
+    await this.deleteFromFavorites(id);
+    await this.deleteRelatedTrackLinks(id);
+  }
+
+  async deleteFromFavorites(id: string) {
     try {
       await this.favoritesService.deleteAlbum(id);
     } catch (err) {
@@ -55,5 +67,12 @@ export class AlbumsService {
         throw err;
       }
     }
+  }
+
+  private async deleteRelatedTrackLinks(id: string) {
+    const tracks = await this.tracksService.filterByAlbumId(id);
+    tracks.forEach(async (track) => {
+      await this.tracksService.update(track.id, { ...track, albumId: null });
+    });
   }
 }

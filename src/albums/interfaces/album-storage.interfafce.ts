@@ -4,4 +4,6 @@ import { CreateAlbumDto } from '../dto/create-album.dto';
 import { UpdateAlbumDto } from '../dto/update-album.dto';
 
 export interface IAlbumStorage
-  extends IAbstractStorage<Album, CreateAlbumDto, UpdateAlbumDto> {}
+  extends IAbstractStorage<Album, CreateAlbumDto, UpdateAlbumDto> {
+  filterByArtistId: (id: string) => Promise<Album[]>;
+}

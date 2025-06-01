@@ -25,6 +25,14 @@ export class TracksService {
     return await this.storage.filterByIds(ids);
   }
 
+  async filterByAlbumId(id: string) {
+    return await this.storage.filterByAlbumId(id);
+  }
+
+  async filterByArtistId(id: string) {
+    return await this.storage.filterByArtistId(id);
+  }
+
   async getById(id: string) {
     const track = await this.storage.getById(id);
     if (!track) {
@@ -47,6 +55,10 @@ export class TracksService {
     if (!result) {
       throw new TrackDoesntExist(id);
     }
+    this.deleteFromFavorites(id);
+  }
+
+  private async deleteFromFavorites(id: string) {
     try {
       await this.favoritesService.deleteTrack(id);
     } catch (err) {

@@ -4,13 +4,13 @@ import { Track } from '../entities/track.entity';
 import { Injectable } from '@nestjs/common';
 import { UpdateTrackDto } from '../dto/update-track.dto';
 import { InMemoryAbstractStorage } from 'src/abstract/abstract-in-memory.storage';
+import { ITrackStorage } from '../interfaces/track-storage.interface';
 
 @Injectable()
-export class InMemoryTrackStorage extends InMemoryAbstractStorage<
-  Track,
-  CreateTrackDto,
-  UpdateTrackDto
-> {
+export class InMemoryTrackStorage
+  extends InMemoryAbstractStorage<Track, CreateTrackDto, UpdateTrackDto>
+  implements ITrackStorage
+{
   async create(dto: CreateTrackDto) {
     const track: Track = {
       id: randomUUID(),
@@ -29,10 +29,20 @@ export class InMemoryTrackStorage extends InMemoryAbstractStorage<
       return null;
     }
     track.name = dto.name || track.name;
-    track.artistId = dto.artistId || track.artistId;
-    track.albumId = dto.albumId || track.albumId;
+    track.artistId =
+      dto.artistId === null || dto.artistId ? dto.artistId : track.artistId;
+    track.albumId =
+      dto.albumId === null || dto.albumId ? dto.albumId : track.albumId;
     track.duration = dto.duration || track.duration;
 
     return track;
+  }
+
+  async filterByArtistId(id: string): Promise<Track[]> {
+    return this.storage.filter((item) => item.artistId === id);
+  }
+
+  async filterByAlbumId(id: string): Promise<Track[]> {
+    return this.storage.filter((item) => item.albumId === id);
   }
 }

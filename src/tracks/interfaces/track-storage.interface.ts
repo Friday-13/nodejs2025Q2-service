@@ -4,4 +4,7 @@ import { CreateTrackDto } from '../dto/create-track.dto';
 import { UpdateTrackDto } from '../dto/update-track.dto';
 
 export interface ITrackStorage
-  extends IAbstractStorage<Track, CreateTrackDto, UpdateTrackDto> {}
+  extends IAbstractStorage<Track, CreateTrackDto, UpdateTrackDto> {
+  filterByArtistId: (id: string) => Promise<Track[]>;
+  filterByAlbumId: (id: string) => Promise<Track[]>;
+}

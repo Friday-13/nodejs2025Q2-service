@@ -4,13 +4,13 @@ import { Album } from '../entities/album.entity';
 import { CreateAlbumDto } from '../dto/create-album.dto';
 import { UpdateAlbumDto } from '../dto/update-album.dto';
 import { randomUUID } from 'crypto';
+import { IAlbumStorage } from '../interfaces/album-storage.interfafce';
 
 @Injectable()
-export class InMemoryAlbumStorage extends InMemoryAbstractStorage<
-  Album,
-  CreateAlbumDto,
-  UpdateAlbumDto
-> {
+export class InMemoryAlbumStorage
+  extends InMemoryAbstractStorage<Album, CreateAlbumDto, UpdateAlbumDto>
+  implements IAlbumStorage
+{
   async create(dto: CreateAlbumDto): Promise<Album> {
     const newAlbum: Album = {
       id: randomUUID(),
@@ -29,7 +29,12 @@ export class InMemoryAlbumStorage extends InMemoryAbstractStorage<
     }
     album.name = dto.name || album.name;
     album.year = dto.year !== null ? dto.year : album.year;
-    album.artistId = dto.artistId || album.artistId;
+    album.artistId =
+      dto.artistId === null || dto.artistId ? dto.artistId : album.artistId;
     return album;
+  }
+
+  async filterByArtistId(id: string): Promise<Album[]> {
+    return this.storage.filter((item) => item.artistId === id);
   }
 }

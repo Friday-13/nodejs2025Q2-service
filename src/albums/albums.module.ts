@@ -3,6 +3,7 @@ import { AlbumsService } from './albums.service';
 import { AlbumsController } from './albums.controller';
 import { InMemoryAlbumStorage } from './store/albums.storage';
 import { FavoritesModule } from 'src/favorites/favorites.module';
+import { TracksModule } from 'src/tracks/tracks.module';
 
 @Module({
   controllers: [AlbumsController],
@@ -14,6 +15,6 @@ import { FavoritesModule } from 'src/favorites/favorites.module';
     },
   ],
   exports: [AlbumsService],
-  imports: [forwardRef(() => FavoritesModule)],
+  imports: [forwardRef(() => TracksModule), forwardRef(() => FavoritesModule)],
 })
 export class AlbumsModule {}
