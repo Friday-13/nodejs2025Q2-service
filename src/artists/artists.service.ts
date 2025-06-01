@@ -1,12 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { IArtistStorage } from './interfaces/artis-storage.interface';
 import ArtistDoesntExist from './errors/artist-doesnt-exist.error';
+import { FavoritesService } from 'src/favorites/favorites.service';
+import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 
 @Injectable()
 export class ArtistsService {
-  constructor(@Inject('IArtistStorage') private storage: IArtistStorage) {}
+  constructor(
+    @Inject('IArtistStorage') private storage: IArtistStorage,
+    @Inject(forwardRef(() => FavoritesService))
+    private favoritesService: FavoritesService,
+  ) {}
   async create(createArtistDto: CreateArtistDto) {
     return await this.storage.create(createArtistDto);
   }
@@ -40,6 +46,13 @@ export class ArtistsService {
     const result = await this.storage.delete(id);
     if (!result) {
       throw new ArtistDoesntExist(id);
+    }
+    try {
+      await this.favoritesService.deleteArtist(id);
+    } catch (err) {
+      if (!(err instanceof RecordDoesntExist)) {
+        throw err;
+      }
     }
   }
 }

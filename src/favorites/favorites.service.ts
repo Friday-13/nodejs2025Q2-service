@@ -1,6 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { IFavoritesStorage } from './interfaces/favorites-storage.interface';
 import { ResponseFavoritesDto } from './dto/response-favorites.dto';
 import { TracksService } from 'src/tracks/tracks.service';
@@ -15,8 +13,11 @@ import { Album } from 'src/albums/entities/album.entity';
 export class FavoritesService {
   constructor(
     @Inject('IFavoritesStorage') private storage: IFavoritesStorage,
+    @Inject(forwardRef(() => TracksService))
     private trackService: TracksService,
+    @Inject(forwardRef(() => ArtistsService))
     private artistService: ArtistsService,
+    @Inject(forwardRef(() => AlbumsService))
     private albumService: AlbumsService,
   ) {}
 
