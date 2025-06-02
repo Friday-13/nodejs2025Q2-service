@@ -11,10 +11,25 @@
 git clone {repository URL}
 ```
 
+## Switch to the current branch
+
+```
+cd {repository dir}
+git checkout rest-service
+```
+
 ## Installing NPM modules
 
 ```
 npm install
+```
+
+## Creating .env
+
+Copy `.env.example` and save as `.env`
+
+```
+cp .env.example .env
 ```
 
 ## Running application
@@ -23,9 +38,17 @@ npm install
 npm start
 ```
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
+or
+
+```
+npm run start:dev
+```
+
+After starting the app on port (4000 as default)
+
+- you can open in your browser OpenAPI documentation by typing [http://localhost:4000/api](http://localhost:4000/api).
+  For more information about OpenAPI/Swagger please visit [https://swagger.io/](https://swagger.io/).
+- you can see default `Hello World!` page on [http://localhost:4000](http://localhost:4000)
 
 ## Testing
 
@@ -43,17 +66,17 @@ To run only one of all test suites
 npm run test -- <path to suite>
 ```
 
-To run all test with authorization
-
-```
-npm run test:auth
-```
-
-To run only specific test suite with authorization
-
-```
-npm run test:auth -- <path to suite>
-```
+<!-- To run all test with authorization -->
+<!---->
+<!-- ``` -->
+<!-- npm run test:auth -->
+<!-- ``` -->
+<!---->
+<!-- To run only specific test suite with authorization -->
+<!---->
+<!-- ``` -->
+<!-- npm run test:auth -- <path to suite> -->
+<!-- ``` -->
 
 ### Auto-fix and format
 
@@ -64,9 +87,3 @@ npm run lint
 ```
 npm run format
 ```
-
-### Debugging in VSCode
-
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
