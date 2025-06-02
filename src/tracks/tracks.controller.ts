@@ -55,7 +55,7 @@ export class TracksController {
     type: Track,
   })
   @ApiBadRequestResponse({
-    description: 'Bad request. body does not contain required fields',
+    description: 'Bad request. Body does not contain required fields',
   })
   async create(@Body() createTrackDto: CreateTrackDto) {
     return await this.tracksService.create(createTrackDto);
