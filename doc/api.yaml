@@ -486,14 +486,14 @@ paths:
             type: string
       responses:
         '201':
-          description: The track has been created.
+          description: The track has been added to favorites
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Track'
         '400':
           description: Bad request. Track id is invalid (not uuid)
-        '404':
+        '422':
           description: Track with id not found
       tags:
         - Favorites
@@ -537,7 +537,7 @@ paths:
                 $ref: '#/components/schemas/Artist'
         '400':
           description: Bad request. Artist id is invalid (not uuid)
-        '404':
+        '422':
           description: Artist with id not found
       tags:
         - Favorites
@@ -581,7 +581,7 @@ paths:
                 $ref: '#/components/schemas/Album'
         '400':
           description: Bad request. Album id is invalid (not uuid)
-        '404':
+        '422':
           description: Album with id not found
       tags:
         - Favorites
