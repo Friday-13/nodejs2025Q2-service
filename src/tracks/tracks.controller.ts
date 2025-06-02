@@ -16,9 +16,7 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 import {
   ApiBadRequestResponse,
-  ApiBody,
   ApiCreatedResponse,
-  ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -74,7 +72,7 @@ export class TracksController {
     type: Track,
   })
   @ApiBadRequestResponse({
-    description: 'Bad request. id is invalid (not uuid)',
+    description: 'Bad request. Track id is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ description: 'Track not found' })
   async getById(@Param('id', ParseUUIDPipe) id: string) {
@@ -92,7 +90,7 @@ export class TracksController {
   @Put(':id')
   @ApiOperation({
     summary: 'Update track information',
-    description: 'Update library track information by id',
+    description: 'Update track information by id',
   })
   @ApiParam({ name: 'id', format: 'uuid', required: true })
   @ApiOkResponse({
@@ -100,7 +98,7 @@ export class TracksController {
     type: Track,
   })
   @ApiBadRequestResponse({
-    description: 'Bad request. id is invalid (not uuid)',
+    description: 'Bad request. Track id is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ description: 'Track not found' })
   async update(
