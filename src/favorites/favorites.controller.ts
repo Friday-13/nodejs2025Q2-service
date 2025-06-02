@@ -20,6 +20,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { Track } from 'src/tracks/entities/track.entity';
 import { Album } from 'src/albums/entities/album.entity';
@@ -78,13 +79,13 @@ export class FavoritesController {
     description: 'Add track to the favorites',
   })
   @ApiCreatedResponse({
-    description: 'The track has been created.',
+    description: 'The track has been added to favorites',
     type: Track,
   })
   @ApiBadRequestResponse({
     description: 'Bad request. Track id is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Track with id not found' })
+  @ApiUnprocessableEntityResponse({ description: 'Track with id not found' })
   async addTrack(@Param('id', ParseUUIDPipe) id: string) {
     return await this.addEntity(
       id,
@@ -125,7 +126,7 @@ export class FavoritesController {
   @ApiBadRequestResponse({
     description: 'Bad request. Artist id is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Artist with id not found' })
+  @ApiUnprocessableEntityResponse({ description: 'Artist with id not found' })
   async addArtist(@Param('id', ParseUUIDPipe) id: string) {
     return await this.addEntity(
       id,
@@ -166,7 +167,7 @@ export class FavoritesController {
   @ApiBadRequestResponse({
     description: 'Bad request. Album id is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Album with id not found' })
+  @ApiUnprocessableEntityResponse({ description: 'Album with id not found' })
   async addAlbum(@Param('id', ParseUUIDPipe) id: string) {
     return await this.addEntity(
       id,
