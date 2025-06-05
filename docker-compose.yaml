@@ -5,14 +5,24 @@ services:
     build: .
     ports:
       - '4000:4000'
+    networks:
+      - custom-network
     depends_on: 
       - db
+
   db:
     image: postgres
     build: ./db/
     ports:
       - '4001:4001'
+    networks:
+      - custom-network
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: 12345
       POSTGRES_DB: default-db
+
+networks:
+  custom-network:
+    name: custom-network
+    driver: bridge
