@@ -4,25 +4,28 @@ services:
     image: api
     build: .
     ports:
-      - '4000:4000'
+      - ${PORT}:${PORT}
     restart: on-failure:3
     networks:
       - custom-network
     depends_on:
       - db
+    environment:
+      PORT: ${PORT}
 
   db:
     image: postgres
     build: ./db/
     ports:
-      - '4001:4001'
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     restart: on-failure:3
     networks:
       - custom-network
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: default-db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PORT: ${POSTGRES_PORT}
 
 networks:
   custom-network:
