@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { InMemoryUserStorage } from './store/user.storage';
+import { PrismaUserStorage } from './store/user.prisma.storage';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
   controllers: [UsersController],
@@ -9,8 +10,9 @@ import { InMemoryUserStorage } from './store/user.storage';
     UsersService,
     {
       provide: 'IUserStorage',
-      useClass: InMemoryUserStorage,
+      useClass: PrismaUserStorage,
     },
   ],
+  imports: [PrismaModule],
 })
 export class UsersModule {}
