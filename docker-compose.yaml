@@ -1,13 +1,14 @@
-version: "3.0"
+version: '3.0'
 services:
   api:
     image: api
     build: .
     ports:
       - '4000:4000'
+    restart: on-failure:3
     networks:
       - custom-network
-    depends_on: 
+    depends_on:
       - db
 
   db:
@@ -15,6 +16,7 @@ services:
     build: ./db/
     ports:
       - '4001:4001'
+    restart: on-failure:3
     networks:
       - custom-network
     environment:
