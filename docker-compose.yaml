@@ -6,6 +6,8 @@ services:
     ports:
       - ${PORT}:${PORT}
     restart: on-failure
+    volumes:
+      - logs:/usr/app/logs
     develop:
       watch:
         - action: sync
@@ -15,7 +17,7 @@ services:
       - custom-network
     depends_on:
       - db
-    environment: 
+    environment:
       PORT: ${PORT}
 
   db:
@@ -23,7 +25,9 @@ services:
     build: ./db/
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
-    restart: on-failure:3
+    restart: on-failure
+    volumes:
+      - library-data:/var/lib/postgresql/data
     networks:
       - custom-network
     environment:
@@ -36,3 +40,7 @@ networks:
   custom-network:
     name: custom-network
     driver: bridge
+
+volumes:
+  library-data:
+  logs:
