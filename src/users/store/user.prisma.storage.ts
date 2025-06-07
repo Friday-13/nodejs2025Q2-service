@@ -1,16 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { IAbstractStorage } from 'src/abstract/abstract-storage.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User as PrismaUser } from '@prisma/client';
 import { UpdatePasswordDto } from '../dto/update-user-password.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { IUserStorage } from '../interfaces/user-storage.interface';
 
 @Injectable()
-export class PrismaUserStorage
-  implements IAbstractStorage<User, CreateUserDto, UpdatePasswordDto>
-{
+export class PrismaUserStorage implements IUserStorage {
   constructor(private prisma: PrismaService) {}
 
   async getAll() {

@@ -1,15 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Track } from '@prisma/client';
-import { IAbstractStorage } from 'src/abstract/abstract-storage.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { CreateTrackDto } from '../dto/create-track.dto';
 import { UpdateTrackDto } from '../dto/update-track.dto';
+import { ITrackStorage } from '../interfaces/track-storage.interface';
 
 @Injectable()
-export class PrismaTrackStorage
-  implements IAbstractStorage<Track, CreateTrackDto, UpdateTrackDto>
-{
+export class PrismaTrackStorage implements ITrackStorage {
   constructor(private prisma: PrismaService) {}
 
   async getAll() {

@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Artist } from '@prisma/client';
-import { IAbstractStorage } from 'src/abstract/abstract-storage.interface';
 import { CreateArtistDto } from '../dto/create-artist.dto';
 import { UpdateArtistDto } from '../dto/update-artist.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { IArtistStorage } from '../interfaces/artis-storage.interface';
 
 @Injectable()
-export class PrismaArtistStorage
-  implements IAbstractStorage<Artist, CreateArtistDto, UpdateArtistDto>
-{
+export class PrismaArtistStorage implements IArtistStorage {
   constructor(private prisma: PrismaService) {}
 
   async getAll() {
