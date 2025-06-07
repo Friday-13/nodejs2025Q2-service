@@ -7,17 +7,6 @@ import { User as PrismaUser } from '@prisma/client';
 import { UpdatePasswordDto } from '../dto/update-user-password.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-function mapPrismaUserToEntity(prismaUser: PrismaUser): User {
-  return {
-    id: prismaUser.id,
-    login: prismaUser.login,
-    password: prismaUser.password,
-    createdAt: prismaUser.createdAt.getTime(),
-    updatedAt: prismaUser.updatedAt.getTime(),
-    version: prismaUser.version,
-  };
-}
-
 @Injectable()
 export class PrismaUserStorage
   implements IAbstractStorage<User, CreateUserDto, UpdatePasswordDto>
@@ -26,25 +15,25 @@ export class PrismaUserStorage
 
   async getAll() {
     const users = await this.prisma.user.findMany();
-    return users.map((user) => mapPrismaUserToEntity(user));
+    return this.mapUsersToEntities(users);
   }
 
   async getById(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id: id } });
     if (!user) return null;
-    return mapPrismaUserToEntity(user);
+    return this.mapUserToEntity(user);
   }
 
   async filterByIds(ids: string[]) {
     const users = await this.prisma.user.findMany({
       where: { id: { in: ids } },
     });
-    return users.map((user) => mapPrismaUserToEntity(user));
+    return this.mapUsersToEntities(users);
   }
 
   async create(dto: CreateUserDto) {
     const user = await this.prisma.user.create({ data: dto });
-    return mapPrismaUserToEntity(user);
+    return this.mapUserToEntity(user);
   }
 
   async update(id: string, dto: UpdatePasswordDto) {
@@ -59,7 +48,7 @@ export class PrismaUserStorage
         },
       },
     });
-    return mapPrismaUserToEntity(user);
+    return this.mapUserToEntity(user);
   }
 
   async delete(id: string) {
@@ -74,5 +63,20 @@ export class PrismaUserStorage
       }
       throw err;
     }
+  }
+
+  private mapUserToEntity(prismaUser: PrismaUser): User {
+    return {
+      id: prismaUser.id,
+      login: prismaUser.login,
+      password: prismaUser.password,
+      createdAt: prismaUser.createdAt.getTime(),
+      updatedAt: prismaUser.updatedAt.getTime(),
+      version: prismaUser.version,
+    };
+  }
+
+  private mapUsersToEntities(prismaUsers: PrismaUser[]): User[] {
+    return prismaUsers.map((user) => this.mapUserToEntity(user));
   }
 }
