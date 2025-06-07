@@ -5,7 +5,12 @@ services:
     build: .
     ports:
       - ${PORT}:${PORT}
-    restart: on-failure:3
+    restart: on-failure
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /usr/app/src
     networks:
       - custom-network
     depends_on:

@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 4000
 
-CMD ["npm", "start"]
+CMD npx prisma generate && npm run start:dev
