@@ -5,6 +5,7 @@ import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User as PrismaUser } from '@prisma/client';
 import { UpdatePasswordDto } from '../dto/update-user-password.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 function mapPrismaUserToEntity(prismaUser: PrismaUser): User {
   return {
@@ -35,7 +36,10 @@ export class PrismaUserStorage
   }
 
   async filterByIds(ids: string[]) {
-    return [];
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: ids } },
+    });
+    return users.map((user) => mapPrismaUserToEntity(user));
   }
 
   async create(dto: CreateUserDto) {
@@ -59,10 +63,16 @@ export class PrismaUserStorage
   }
 
   async delete(id: string) {
-    const result = await this.prisma.user.delete({ where: { id: id } });
-    if (result) {
+    try {
+      await this.prisma.user.delete({ where: { id: id } });
       return true;
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === 'P2025') {
+          return false;
+        }
+      }
+      throw err;
     }
-    return false;
   }
 }

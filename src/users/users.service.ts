@@ -58,9 +58,6 @@ export class UsersService {
 
   async delete(id: string) {
     const result = await this.storage.delete(id);
-    console.log('===================');
-    console.log(`${result}`);
-    console.log('===================');
     if (!result) {
       throw new UserDoesntExist(id);
     }
