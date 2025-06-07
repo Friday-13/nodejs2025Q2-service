@@ -1,8 +1,9 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { TracksController } from './tracks.controller';
-import { InMemoryTrackStorage } from './store/track.storage';
 import { FavoritesModule } from 'src/favorites/favorites.module';
+import { PrismaTrackStorage } from './store/track.prisma.storage';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
   controllers: [TracksController],
@@ -10,10 +11,10 @@ import { FavoritesModule } from 'src/favorites/favorites.module';
     TracksService,
     {
       provide: 'ITrackStorage',
-      useClass: InMemoryTrackStorage,
+      useClass: PrismaTrackStorage,
     },
   ],
-  imports: [forwardRef(() => FavoritesModule)],
+  imports: [PrismaModule, forwardRef(() => FavoritesModule)],
   exports: [TracksService],
 })
 export class TracksModule {}
