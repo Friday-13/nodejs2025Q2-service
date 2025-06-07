@@ -1,10 +1,11 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { FavoritesController } from './favorites.controller';
-import { ImMemoryFavoritesStorage } from './store/favorites.storage';
 import { TracksModule } from 'src/tracks/tracks.module';
 import { ArtistsModule } from 'src/artists/artists.module';
 import { AlbumsModule } from 'src/albums/albums.module';
+import { PrismaFavoritesStorage } from './store/favorites.prisma.storage';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
   controllers: [FavoritesController],
@@ -12,10 +13,11 @@ import { AlbumsModule } from 'src/albums/albums.module';
     FavoritesService,
     {
       provide: 'IFavoritesStorage',
-      useClass: ImMemoryFavoritesStorage,
+      useClass: PrismaFavoritesStorage,
     },
   ],
   imports: [
+    PrismaModule,
     forwardRef(() => TracksModule),
     forwardRef(() => ArtistsModule),
     forwardRef(() => AlbumsModule),

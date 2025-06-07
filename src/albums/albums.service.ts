@@ -55,8 +55,8 @@ export class AlbumsService {
     if (!result) {
       throw new AlbumDoesntExist(id);
     }
-    await this.deleteFromFavorites(id);
-    await this.deleteRelatedTrackLinks(id);
+    // await this.deleteFromFavorites(id);
+    // await this.deleteRelatedTrackLinks(id);
   }
 
   async deleteFromFavorites(id: string) {

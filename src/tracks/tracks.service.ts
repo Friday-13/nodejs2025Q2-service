@@ -55,7 +55,7 @@ export class TracksService {
     if (!result) {
       throw new TrackDoesntExist(id);
     }
-    this.deleteFromFavorites(id);
+    // this.deleteFromFavorites(id);
   }
 
   private async deleteFromFavorites(id: string) {
