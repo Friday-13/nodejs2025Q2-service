@@ -15,7 +15,7 @@ services:
       - custom-network
     depends_on:
       - db
-    environment:
+    environment: 
       PORT: ${PORT}
 
   db:
