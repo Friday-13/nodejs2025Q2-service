@@ -1,7 +1,6 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { TracksController } from './tracks.controller';
-import { FavoritesModule } from 'src/favorites/favorites.module';
 import { PrismaTrackStorage } from './store/track.prisma.storage';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
@@ -14,7 +13,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
       useClass: PrismaTrackStorage,
     },
   ],
-  imports: [PrismaModule, forwardRef(() => FavoritesModule)],
+  imports: [PrismaModule],
   exports: [TracksService],
 })
 export class TracksModule {}

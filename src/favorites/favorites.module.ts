@@ -16,12 +16,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
       useClass: PrismaFavoritesStorage,
     },
   ],
-  imports: [
-    PrismaModule,
-    forwardRef(() => TracksModule),
-    forwardRef(() => ArtistsModule),
-    forwardRef(() => AlbumsModule),
-  ],
+  imports: [PrismaModule, TracksModule, ArtistsModule, AlbumsModule],
   exports: [FavoritesService],
 })
 export class FavoritesModule {}
