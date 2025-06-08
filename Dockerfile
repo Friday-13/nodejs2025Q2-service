@@ -1,0 +1,13 @@
+FROM node:22.16-alpine
+
+WORKDIR /usr/app
+
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+COPY . .
+
+EXPOSE 4000
+
+CMD npx prisma generate && npm run start:dev > logs/api.logs 2>&1

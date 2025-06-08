@@ -1,0 +1,46 @@
+version: '3.0'
+services:
+  api:
+    image: api
+    build: .
+    ports:
+      - ${PORT}:${PORT}
+    restart: on-failure
+    volumes:
+      - logs:/usr/app/logs
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /usr/app/src
+    networks:
+      - custom-network
+    depends_on:
+      - db
+    environment:
+      PORT: ${PORT}
+
+  db:
+    image: postgres
+    build: ./db/
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    restart: on-failure
+    volumes:
+      - library-data:/var/lib/postgresql/data
+    networks:
+      - custom-network
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+
+networks:
+  custom-network:
+    name: custom-network
+    driver: bridge
+
+volumes:
+  library-data:
+  logs:

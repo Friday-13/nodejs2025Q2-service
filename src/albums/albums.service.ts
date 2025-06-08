@@ -1,22 +1,12 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import AlbumDoesntExist from './errors/album-doesnt-exist.error';
 import { IAlbumStorage } from './interfaces/album-storage.interfafce';
-import { FavoritesService } from 'src/favorites/favorites.service';
-import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
-import { TracksService } from 'src/tracks/tracks.service';
 
 @Injectable()
 export class AlbumsService {
-  constructor(
-    @Inject('IAlbumStorage') private storage: IAlbumStorage,
-
-    @Inject(forwardRef(() => FavoritesService))
-    private favoritesService: FavoritesService,
-    @Inject(forwardRef(() => TracksService))
-    private tracksService: TracksService,
-  ) {}
+  constructor(@Inject('IAlbumStorage') private storage: IAlbumStorage) {}
   async create(createAlbumDto: CreateAlbumDto) {
     return await this.storage.create(createAlbumDto);
   }
@@ -55,24 +45,5 @@ export class AlbumsService {
     if (!result) {
       throw new AlbumDoesntExist(id);
     }
-    await this.deleteFromFavorites(id);
-    await this.deleteRelatedTrackLinks(id);
-  }
-
-  async deleteFromFavorites(id: string) {
-    try {
-      await this.favoritesService.deleteAlbum(id);
-    } catch (err) {
-      if (!(err instanceof RecordDoesntExist)) {
-        throw err;
-      }
-    }
-  }
-
-  private async deleteRelatedTrackLinks(id: string) {
-    const tracks = await this.tracksService.filterByAlbumId(id);
-    tracks.forEach(async (track) => {
-      await this.tracksService.update(track.id, { ...track, albumId: null });
-    });
   }
 }

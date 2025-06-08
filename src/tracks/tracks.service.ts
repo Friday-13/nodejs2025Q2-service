@@ -1,18 +1,12 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { ITrackStorage } from './interfaces/track-storage.interface';
 import TrackDoesntExist from './errors/track-doesnt-exist.error';
-import { FavoritesService } from 'src/favorites/favorites.service';
-import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 
 @Injectable()
 export class TracksService {
-  constructor(
-    @Inject('ITrackStorage') private storage: ITrackStorage,
-    @Inject(forwardRef(() => FavoritesService))
-    private favoritesService: FavoritesService,
-  ) {}
+  constructor(@Inject('ITrackStorage') private storage: ITrackStorage) {}
   async create(createTrackDto: CreateTrackDto) {
     return await this.storage.create(createTrackDto);
   }
@@ -54,17 +48,6 @@ export class TracksService {
     const result = await this.storage.delete(id);
     if (!result) {
       throw new TrackDoesntExist(id);
-    }
-    this.deleteFromFavorites(id);
-  }
-
-  private async deleteFromFavorites(id: string) {
-    try {
-      await this.favoritesService.deleteTrack(id);
-    } catch (err) {
-      if (!(err instanceof RecordDoesntExist)) {
-        throw err;
-      }
     }
   }
 }
