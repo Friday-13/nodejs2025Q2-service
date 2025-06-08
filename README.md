@@ -1,48 +1,64 @@
 # Home Library Service
 
-## Prerequisites
+## Prerequisite
 
-- Git - [Download & Install Git](https://git-scm.com/downloads).
-- Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+1. Git - [Download & Install Git](https://git-scm.com/downloads).
+2. Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+3. [Docker](https://docs.docker.com/engine/install/)
+4. Docker-compose
+5. [Docker Scout](https://docs.docker.com/scout/install/)
 
-## Downloading
+## Installation
 
-```
-git clone {repository URL}
-```
+### 1. Clone this repository:
 
-## Switch to the current branch
-
-```
-cd {repository dir}
-git checkout rest-service
+```shell
+git clone <src> <dir-name>
 ```
 
-## Installing NPM modules
+### 2. Move to the project directory:
 
+```shell
+cd <dir-name>
 ```
-npm install
+
+### 3. Check out the branch with the containerization task:
+
+```shell
+git checkout containerization-database-orm
 ```
 
-## Creating .env
+### 4. Istall dependencies:
 
-Copy `.env.example` and save as `.env`
-
+```shell
+npm i
 ```
+
+### 5. Create the `.env` file (copy the `.env.example` or create manually)
+
+```shell
 cp .env.example .env
 ```
 
-## Running application
+### 6. Run multi-container application
 
 ```
-npm start
+docker-compose up --watch
 ```
 
-or
+### 7. Run the migration:
 
+```shell
+docker exec -it <dir-name>-api-1 npx prisma migrate dev --name init
 ```
-npm run start:dev
+
+If you encounter issues with container naming, you can find the exact container name with:
+
+```shell
+docker container ls
 ```
+
+Look for the container associated with the `api` image.
 
 After starting the app on port (4000 as default)
 
@@ -77,6 +93,13 @@ npm run test -- <path to suite>
 <!-- ``` -->
 <!-- npm run test:auth -- <path to suite> -->
 <!-- ``` -->
+
+### Scan the image for security vulnerabilities
+
+```shell
+npm run docker:scan
+```
+
 
 ### Auto-fix and format
 

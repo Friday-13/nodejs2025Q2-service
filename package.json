@@ -24,7 +24,6 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "prisma:seed": "ts-node prisma/seed.ts",
-    "prisma:migrate-init": "docker exec -it home-library-api-1 npx prisma migrate dev --name init",
     "docker:scan": "docker scout cves api"
   },
   "dependencies": {
