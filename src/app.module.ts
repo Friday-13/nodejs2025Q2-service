@@ -11,6 +11,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { LoggingService } from './logging/logging.service';
 import configs from './configs';
 import { LoggingModule } from './logging/logging.module';
+import { ExceptionFiltersModule } from './exception-filters/exception-filters.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { LoggingModule } from './logging/logging.module';
     FavoritesModule,
     PrismaModule,
     LoggingModule,
+    ExceptionFiltersModule,
   ],
   controllers: [AppController],
   providers: [AppService, LoggingService],

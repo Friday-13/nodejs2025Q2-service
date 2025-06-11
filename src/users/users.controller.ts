@@ -11,6 +11,7 @@ import {
   HttpCode,
   ForbiddenException,
   Req,
+  UseFilters,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -31,6 +32,7 @@ import {
 import { User } from './entities/user.entity';
 import { LoggingService } from 'src/logging/logging.service';
 import { logRequest, logResponse } from 'src/logging/endpoint-logs.util';
+import { HttpExceptionFilter } from 'src/exception-filters/http-exception/http-exception.filter';
 
 @ApiTags('Users')
 @Controller('user')
@@ -73,6 +75,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  // @UseFilters(HttpExceptionFilter)
   @ApiOperation({
     summary: 'Get single user by id',
     description: 'Get single user by id',
@@ -94,9 +97,9 @@ export class UsersController {
       return user;
     } catch (err) {
       if (err instanceof UserDoesntExist) {
-        //TODO: add error logging
         throw new NotFoundException(err.message);
       }
+      throw err;
     }
   }
 
@@ -129,11 +132,9 @@ export class UsersController {
       return response;
     } catch (err) {
       if (err instanceof UserDoesntExist) {
-        //TODO: add error logging
         throw new NotFoundException(err.message);
       }
       if (err instanceof InvalidCredentials) {
-        //TODO: add error logging
         throw new ForbiddenException(err.message);
       }
       throw err;
@@ -161,7 +162,6 @@ export class UsersController {
       logResponse(this.logging);
     } catch (err) {
       if (err instanceof UserDoesntExist) {
-        //TODO: add error logging
         throw new NotFoundException(err.message);
       }
     }
