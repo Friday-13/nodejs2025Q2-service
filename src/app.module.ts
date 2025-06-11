@@ -8,7 +8,9 @@ import { AlbumsModule } from './albums/albums.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
+import { LoggingService } from './logging/logging.service';
 import configs from './configs';
+import { LoggingModule } from './logging/logging.module';
 
 @Module({
   imports: [
@@ -19,8 +21,9 @@ import configs from './configs';
     AlbumsModule,
     FavoritesModule,
     PrismaModule,
+    LoggingModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, LoggingService],
 })
 export class AppModule {}

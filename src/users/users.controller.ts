@@ -10,6 +10,7 @@ import {
   NotFoundException,
   HttpCode,
   ForbiddenException,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -28,11 +29,18 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
+import { LoggingService } from 'src/logging/logging.service';
+import { logRequest, logResponse } from 'src/logging/endpoint-logs.util';
 
 @ApiTags('Users')
 @Controller('user')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private logging: LoggingService,
+  ) {
+    this.logging.setContext('Users');
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get all users', description: 'Gets all users' })
@@ -41,8 +49,11 @@ export class UsersController {
     type: User,
     isArray: true,
   })
-  async getAll() {
-    return await this.usersService.findAll();
+  async getAll(@Req() req: Request) {
+    logRequest(this.logging, req);
+    const res = await this.usersService.findAll();
+    logResponse(this.logging);
+    return res;
   }
 
   @Post()
@@ -54,8 +65,11 @@ export class UsersController {
   @ApiBadRequestResponse({
     description: 'Bad request. body does not contain required fields',
   })
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.create(createUserDto);
+  async create(@Req() req: Request, @Body() createUserDto: CreateUserDto) {
+    logRequest(this.logging, req);
+    const res = await this.usersService.create(createUserDto);
+    logResponse(this.logging);
+    return res;
   }
 
   @Get(':id')
@@ -72,12 +86,15 @@ export class UsersController {
     description: 'Bad request. id is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ description: 'User not found' })
-  async getById(@Param('id', ParseUUIDPipe) id: string) {
+  async getById(@Req() req: Request, @Param('id', ParseUUIDPipe) id: string) {
+    logRequest(this.logging, req);
     try {
       const user = await this.usersService.getById(id);
+      logResponse(this.logging);
       return user;
     } catch (err) {
       if (err instanceof UserDoesntExist) {
+        //TODO: add error logging
         throw new NotFoundException(err.message);
       }
     }
@@ -101,17 +118,22 @@ export class UsersController {
   })
   @ApiNotFoundResponse({ description: 'User not found' })
   async update(
+    @Req() req: Request,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
+    logRequest(this.logging, req);
     try {
-      const user = await this.usersService.update(id, updatePasswordDto);
-      return user;
+      const response = await this.usersService.update(id, updatePasswordDto);
+      logResponse(this.logging);
+      return response;
     } catch (err) {
       if (err instanceof UserDoesntExist) {
+        //TODO: add error logging
         throw new NotFoundException(err.message);
       }
       if (err instanceof InvalidCredentials) {
+        //TODO: add error logging
         throw new ForbiddenException(err.message);
       }
       throw err;
@@ -132,11 +154,14 @@ export class UsersController {
     description: 'The user has been deleted',
   })
   @ApiNotFoundResponse({ description: 'User not found' })
-  async delete(@Param('id', ParseUUIDPipe) id: string) {
+  async delete(@Req() req: Request, @Param('id', ParseUUIDPipe) id: string) {
+    logRequest(this.logging, req);
     try {
       await this.usersService.delete(id);
+      logResponse(this.logging);
     } catch (err) {
       if (err instanceof UserDoesntExist) {
+        //TODO: add error logging
         throw new NotFoundException(err.message);
       }
     }
