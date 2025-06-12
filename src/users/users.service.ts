@@ -43,6 +43,7 @@ export class UsersService {
     if (!user) {
       throw new UserDoesntExist(login, 'login');
     }
+    return user;
   }
 
   async update(id: string, updatePasswordDto: UpdatePasswordDto) {

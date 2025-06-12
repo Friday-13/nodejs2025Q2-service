@@ -15,5 +15,6 @@ import { LoggingModule } from 'src/logging/logging.module';
     },
   ],
   imports: [PrismaModule, LoggingModule],
+  exports: [UsersService],
 })
 export class UsersModule {}
