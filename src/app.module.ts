@@ -12,6 +12,7 @@ import { LoggingService } from './logging/logging.service';
 import configs from './configs';
 import { LoggingModule } from './logging/logging.module';
 import { ExceptionFiltersModule } from './exception-filters/exception-filters.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ExceptionFiltersModule } from './exception-filters/exception-filters.mo
     PrismaModule,
     LoggingModule,
     ExceptionFiltersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, LoggingService],
