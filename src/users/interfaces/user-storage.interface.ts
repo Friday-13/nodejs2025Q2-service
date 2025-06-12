@@ -4,4 +4,6 @@ import { UpdatePasswordDto } from '../dto/update-user-password.dto';
 import { User } from '../entities/user.entity';
 
 export interface IUserStorage
-  extends IAbstractStorage<User, CreateUserDto, UpdatePasswordDto> {}
+  extends IAbstractStorage<User, CreateUserDto, UpdatePasswordDto> {
+  getByLogin: (login: string) => Promise<User | null>;
+}

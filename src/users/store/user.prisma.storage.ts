@@ -22,6 +22,14 @@ export class PrismaUserStorage implements IUserStorage {
     return this.mapUserToEntity(user);
   }
 
+  async getByLogin(login: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { login: login },
+    });
+    if (!user) return null;
+    return this.mapUserToEntity(user);
+  }
+
   async filterByIds(ids: string[]) {
     const users = await this.prisma.user.findMany({
       where: { id: { in: ids } },
@@ -30,8 +38,12 @@ export class PrismaUserStorage implements IUserStorage {
   }
 
   async create(dto: CreateUserDto) {
-    const user = await this.prisma.user.create({ data: dto });
-    return this.mapUserToEntity(user);
+    try {
+      const user = await this.prisma.user.create({ data: dto });
+      return this.mapUserToEntity(user);
+    } catch (err) {
+      return null;
+    }
   }
 
   async update(id: string, dto: UpdatePasswordDto) {

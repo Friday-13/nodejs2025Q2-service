@@ -5,6 +5,7 @@ import { IUserStorage } from './interfaces/user-storage.interface';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { UserDoesntExist } from './errors/user-doesnt-exist.error';
 import InvalidCredentials from './errors/invalid-credentials.error';
+import LoginAlreadyExists from './errors/login-already-exists.error';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +14,7 @@ export class UsersService {
   async create(dto: CreateUserDto): Promise<ResponseUserDto> {
     const user = await this.storage.create(dto);
     if (!user) {
-      return null;
+      throw new LoginAlreadyExists(dto.login);
     }
     const withoutPasswordUser: ResponseUserDto = {
       id: user.id,

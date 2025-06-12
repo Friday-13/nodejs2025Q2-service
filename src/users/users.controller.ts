@@ -11,7 +11,7 @@ import {
   HttpCode,
   ForbiddenException,
   Req,
-  UseFilters,
+  ConflictException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -32,7 +32,7 @@ import {
 import { User } from './entities/user.entity';
 import { LoggingService } from 'src/logging/logging.service';
 import { logRequest, logResponse } from 'src/logging/endpoint-logs.util';
-import { HttpExceptionFilter } from 'src/exception-filters/http-exception/http-exception.filter';
+import RecordAlreadyExists from 'src/errors/record-already-exists.error';
 
 @ApiTags('Users')
 @Controller('user')
@@ -69,13 +69,19 @@ export class UsersController {
   })
   async create(@Req() req: Request, @Body() createUserDto: CreateUserDto) {
     logRequest(this.logging, req);
-    const res = await this.usersService.create(createUserDto);
-    logResponse(this.logging);
-    return res;
+    try {
+      const res = await this.usersService.create(createUserDto);
+      logResponse(this.logging);
+      return res;
+    } catch (err) {
+      if (err instanceof RecordAlreadyExists) {
+        throw new ConflictException(err.message);
+      }
+      throw err;
+    }
   }
 
   @Get(':id')
-  // @UseFilters(HttpExceptionFilter)
   @ApiOperation({
     summary: 'Get single user by id',
     description: 'Get single user by id',

@@ -4,13 +4,19 @@ import { randomUUID } from 'node:crypto';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdatePasswordDto } from '../dto/update-user-password.dto';
 import { InMemoryAbstractStorage } from 'src/abstract/abstract-in-memory.storage';
+import { IUserStorage } from '../interfaces/user-storage.interface';
 
 @Injectable()
-export class InMemoryUserStorage extends InMemoryAbstractStorage<
-  User,
-  CreateUserDto,
-  UpdatePasswordDto
-> {
+export class InMemoryUserStorage
+  extends InMemoryAbstractStorage<User, CreateUserDto, UpdatePasswordDto>
+  implements IUserStorage
+{
+  async getByLogin(login: string) {
+    const user = this.storage.find((user) => user.login === login);
+    if (!user) return null;
+    return user;
+  }
+
   async create(dto: CreateUserDto) {
     const user: User = {
       id: randomUUID(),
