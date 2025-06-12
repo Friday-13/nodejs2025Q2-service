@@ -38,6 +38,13 @@ export class UsersService {
     return user;
   }
 
+  async getByLogin(login: string) {
+    const user = await this.storage.getByLogin(login);
+    if (!user) {
+      throw new UserDoesntExist(login, 'login');
+    }
+  }
+
   async update(id: string, updatePasswordDto: UpdatePasswordDto) {
     const user = await this.storage.getById(id);
     if (!user) {
