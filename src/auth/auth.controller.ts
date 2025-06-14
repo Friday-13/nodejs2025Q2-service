@@ -5,6 +5,7 @@ import {
   HttpCode,
   Post,
   Req,
+  Request,
 } from '@nestjs/common';
 import {
   ApiForbiddenResponse,
@@ -19,6 +20,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 import InvalidCredentials from './errors/invalid-credentials.error';
 import { ResponseLoginDto } from './dto/login-response.dto';
+import { Public } from './public.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -31,6 +33,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Public()
   @HttpCode(200)
   @ApiOperation({
     summary: "Login with user's login and password",
