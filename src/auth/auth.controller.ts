@@ -10,15 +10,17 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 import { logRequest, logResponse } from 'src/logging/endpoint-logs.util';
-import { User } from 'src/users/entities/user.entity';
 import { AuthService } from './auth.service';
 import { LoggingService } from 'src/logging/logging.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 import InvalidCredentials from './errors/invalid-credentials.error';
+import { ResponseLoginDto } from './dto/login-response.dto';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -36,8 +38,8 @@ export class AuthController {
   })
   @ApiOkResponse({
     //TODO: add correct OK response
-    description: 'User data',
-    type: User,
+    description: 'Access token',
+    type: ResponseLoginDto,
   })
   @ApiForbiddenResponse({ description: 'Incorrect login or password' })
   async login(@Req() req: Request, @Body() loginUserDto: LoginUserDto) {

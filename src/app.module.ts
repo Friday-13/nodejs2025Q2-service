@@ -17,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ load: [configs], isGlobal: true }),
+    AuthModule,
     UsersModule,
     TracksModule,
     ArtistsModule,
@@ -25,7 +26,6 @@ import { AuthModule } from './auth/auth.module';
     PrismaModule,
     LoggingModule,
     ExceptionFiltersModule,
-    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, LoggingService],
