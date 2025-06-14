@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ResponseLoginDto } from './dto/login-response.dto';
 import LoginAlreadyExists from 'src/users/errors/login-already-exists.error';
 import { ResponseSignupDto } from './dto/signup-response.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -13,10 +14,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
   async login(login: string, password: string): Promise<ResponseLoginDto> {
-    console.log(login);
-    console.log(password);
     const user = await this.userService.getByLogin(login);
-    if (user.password !== password) {
+    const isPasswordsMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordsMatch) {
       throw new InvalidCredentials();
     }
     const payload = { userId: user.id, login: user.login };
