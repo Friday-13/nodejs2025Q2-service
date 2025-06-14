@@ -40,7 +40,6 @@ export class AuthController {
     description: "Login with user's login and password",
   })
   @ApiOkResponse({
-    //TODO: add correct OK response
     description: 'Access token',
     type: ResponseLoginDto,
   })
@@ -58,6 +57,34 @@ export class AuthController {
       if (err instanceof RecordDoesntExist) {
         throw new ForbiddenException(err.message);
       }
+      if (err instanceof InvalidCredentials) {
+        throw new ForbiddenException(err.message);
+      }
+      throw err;
+    }
+  }
+
+  @Post('signup')
+  @Public()
+  @ApiOperation({
+    summary: 'Create new user with given login and password',
+    description: 'Create new user with given login and password',
+  })
+  @ApiOkResponse({
+    description: 'Access token',
+    type: ResponseLoginDto,
+  })
+  @ApiForbiddenResponse({ description: 'Incorrect login or password' })
+  async signup(@Req() req: Request, @Body() loginUserDto: LoginUserDto) {
+    logRequest(this.logging, req);
+    try {
+      const response = await this.authService.signup(
+        loginUserDto.login,
+        loginUserDto.password,
+      );
+      logResponse(this.logging);
+      return response;
+    } catch (err) {
       if (err instanceof InvalidCredentials) {
         throw new ForbiddenException(err.message);
       }
