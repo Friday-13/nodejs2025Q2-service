@@ -20,6 +20,7 @@ async function bootstrap() {
     .addServer('/')
     .setDescription('Home music library service')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const options: SwaggerDocumentOptions = {

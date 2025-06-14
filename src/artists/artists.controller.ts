@@ -16,6 +16,7 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -27,6 +28,7 @@ import {
 import { Artist } from './entities/artist.entity';
 
 @ApiTags('Artists')
+@ApiBearerAuth()
 @Controller('artist')
 export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}

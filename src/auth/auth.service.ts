@@ -16,7 +16,7 @@ export class AuthService {
     if (user.password !== password) {
       throw new InvalidCredentials();
     }
-    const payload = { sub: user.id, login: user.login };
+    const payload = { userId: user.id, login: user.login };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

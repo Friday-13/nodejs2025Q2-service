@@ -13,6 +13,7 @@ import { FavoritesService } from './favorites.service';
 import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -28,6 +29,7 @@ import { Artist } from 'src/artists/entities/artist.entity';
 import { ResponseFavoritesDto } from './dto/response-favorites.dto';
 
 @ApiTags('Favorites')
+@ApiBearerAuth()
 @Controller('favs')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}

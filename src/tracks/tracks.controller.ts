@@ -16,6 +16,7 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -27,6 +28,7 @@ import {
 import { Track } from './entities/track.entity';
 
 @ApiTags('Tracks')
+@ApiBearerAuth()
 @Controller('track')
 export class TracksController {
   constructor(private readonly tracksService: TracksService) {}

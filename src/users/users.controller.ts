@@ -20,6 +20,7 @@ import { UserDoesntExist } from './errors/user-doesnt-exist.error';
 import InvalidCredentials from './errors/invalid-credentials.error';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNoContentResponse,
@@ -35,6 +36,7 @@ import { logRequest, logResponse } from 'src/logging/endpoint-logs.util';
 import RecordAlreadyExists from 'src/errors/record-already-exists.error';
 
 @ApiTags('Users')
+@ApiBearerAuth()
 @Controller('user')
 export class UsersController {
   constructor(
