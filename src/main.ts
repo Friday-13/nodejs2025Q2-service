@@ -30,6 +30,7 @@ async function bootstrap() {
   const documentFactory = () =>
     SwaggerModule.createDocument(app, config, options);
   SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup('doc', app, documentFactory);
 
   const configService = app.get(ConfigService);
   const port = configService.get('PORT');

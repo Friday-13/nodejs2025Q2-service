@@ -4,6 +4,7 @@ import InvalidCredentials from './errors/invalid-credentials.error';
 import { JwtService } from '@nestjs/jwt';
 import { ResponseLoginDto } from './dto/login-response.dto';
 import LoginAlreadyExists from 'src/users/errors/login-already-exists.error';
+import { ResponseSignupDto } from './dto/signup-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,20 +13,22 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
   async login(login: string, password: string): Promise<ResponseLoginDto> {
+    console.log(login);
+    console.log(password);
     const user = await this.userService.getByLogin(login);
     if (user.password !== password) {
       throw new InvalidCredentials();
     }
     const payload = { userId: user.id, login: user.login };
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      accessToken: await this.jwtService.signAsync(payload),
     };
   }
 
-  async signup(login: string, password: string): Promise<ResponseLoginDto> {
+  async signup(login: string, password: string): Promise<ResponseSignupDto> {
     try {
-      await this.userService.create({ login, password });
-      return await this.login(login, password);
+      const user = await this.userService.create({ login, password });
+      return { id: user.id };
     } catch (err) {
       if (err instanceof LoginAlreadyExists) {
         throw new InvalidCredentials(err.message);

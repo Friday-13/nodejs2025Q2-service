@@ -8,6 +8,7 @@ import {
   Request,
 } from '@nestjs/common';
 import {
+    ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
@@ -21,6 +22,8 @@ import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 import InvalidCredentials from './errors/invalid-credentials.error';
 import { ResponseLoginDto } from './dto/login-response.dto';
 import { Public } from './public.decorator';
+import { SignUpUserDto } from './dto/signup-user.dto';
+import { ResponseSignupDto } from './dto/signup-response.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -70,17 +73,17 @@ export class AuthController {
     summary: 'Create new user with given login and password',
     description: 'Create new user with given login and password',
   })
-  @ApiOkResponse({
-    description: 'Access token',
-    type: ResponseLoginDto,
+  @ApiCreatedResponse({
+    description: 'Created user id',
+    type: ResponseSignupDto,
   })
-  @ApiForbiddenResponse({ description: 'Incorrect login or password' })
-  async signup(@Req() req: Request, @Body() loginUserDto: LoginUserDto) {
+  @ApiForbiddenResponse({ description: 'User with this login already exists' })
+  async signup(@Req() req: Request, @Body() signupUserDto: SignUpUserDto) {
     logRequest(this.logging, req);
     try {
       const response = await this.authService.signup(
-        loginUserDto.login,
-        loginUserDto.password,
+        signupUserDto.login,
+        signupUserDto.password,
       );
       logResponse(this.logging);
       return response;
