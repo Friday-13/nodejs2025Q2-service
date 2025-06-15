@@ -5,9 +5,9 @@ import {
   HttpCode,
   Post,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOkResponse,
@@ -24,8 +24,9 @@ import { ResponseLoginDto } from './dto/login-response.dto';
 import { Public } from './public.decorator';
 import { SignUpUserDto } from './dto/signup-user.dto';
 import { ResponseSignupDto } from './dto/signup-response.dto';
-import { AuthGuard } from './auth.guard';
 import { Request } from 'express';
+import { RefreshDto } from './dto/refresh.dto';
+import { JsonWebTokenError } from 'jsonwebtoken';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -98,8 +99,8 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @ApiBearerAuth()
   @HttpCode(200)
+  @Public()
   @ApiOperation({
     summary: 'Get fresh access token',
     description: 'Get fresh access token',
@@ -108,15 +109,17 @@ export class AuthController {
     description: 'Access and refresh tokens',
     type: ResponseLoginDto,
   })
-  async refresh(@Req() req: Request) {
+  async refresh(@Req() req: Request, @Body() refreshDto: RefreshDto) {
     logRequest(this.logging, req);
-    console.log(req.headers.authorization);
     try {
-      const response = await this.authService.refresh(req);
+      const response = await this.authService.refresh(refreshDto);
       logResponse(this.logging);
       return response;
     } catch (err) {
       if (err instanceof InvalidCredentials) {
+        throw new UnauthorizedException(err.message);
+      }
+      if (err instanceof JsonWebTokenError) {
         throw new ForbiddenException(err.message);
       }
       throw err;

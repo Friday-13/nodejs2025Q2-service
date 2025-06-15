@@ -1,4 +1,4 @@
-import { Injectable, Req } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import InvalidCredentials from './errors/invalid-credentials.error';
 import { JwtService } from '@nestjs/jwt';
@@ -6,8 +6,8 @@ import { ResponseLoginDto } from './dto/login-response.dto';
 import LoginAlreadyExists from 'src/users/errors/login-already-exists.error';
 import { ResponseSignupDto } from './dto/signup-response.dto';
 import * as bcrypt from 'bcrypt';
-import { Request } from 'express';
-import { IAccessTokenPayload, IBaseTokenPayload, IRefreshTokenPayload } from './token.interface';
+import { IBaseTokenPayload } from './token.interface';
+import { RefreshDto } from './dto/refresh.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,20 +21,19 @@ export class AuthService {
     if (!isPasswordsMatch) {
       throw new InvalidCredentials();
     }
-    const accessPayload: IAccessTokenPayload = {
+    const accessPayload: IBaseTokenPayload = {
       userId: user.id,
       login: user.login,
-      tokenType: 'access_token',
     };
-    const refreshPayload: IRefreshTokenPayload = {
+    const refreshPayload: IBaseTokenPayload = {
       userId: user.id,
-      tokenType: 'refresh_token',
+      login: user.login,
     };
     return {
       accessToken: await this.jwtService.signAsync(accessPayload),
       refreshToken: await this.jwtService.signAsync(refreshPayload, {
         //TODO: load this from env
-        expiresIn: '1m',
+        expiresIn: '24h',
       }),
     };
   }
@@ -51,33 +50,31 @@ export class AuthService {
     }
   }
 
-  async refresh(@Req() request: Request) {
-    const [type, token] = request.headers.authorization.split(' ') ?? [];
-    if (type !== 'Bearer') {
+  async refresh(refreshDto: RefreshDto) {
+    const token = refreshDto.refreshToken;
+    if (!token) {
       throw new InvalidCredentials();
     }
-    const payload = this.jwtService.decode(token) as IBaseTokenPayload;
-    if (payload.tokenType !== 'refresh_token') {
-      throw new InvalidCredentials();
-    }
+    const payload = (await this.jwtService.verifyAsync(
+      token,
+    )) as IBaseTokenPayload;
 
     const user = await this.userService.getById(payload.userId);
 
-    const accessPayload: IAccessTokenPayload = {
+    const accessPayload: IBaseTokenPayload = {
       userId: user.id,
       login: user.login,
-      tokenType: 'access_token',
     };
-    const refreshPayload: IRefreshTokenPayload = {
+    const refreshPayload: IBaseTokenPayload = {
       userId: user.id,
-      tokenType: 'refresh_token',
+      login: user.login,
     };
 
     return {
       accessToken: await this.jwtService.signAsync(accessPayload),
       refreshToken: await this.jwtService.signAsync(refreshPayload, {
         //TODO: load this from env
-        expiresIn: '1m',
+        expiresIn: '24h',
       }),
     };
   }
