@@ -5,10 +5,10 @@ import {
   HttpCode,
   Post,
   Req,
-  Request,
 } from '@nestjs/common';
 import {
-    ApiCreatedResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
@@ -24,6 +24,8 @@ import { ResponseLoginDto } from './dto/login-response.dto';
 import { Public } from './public.decorator';
 import { SignUpUserDto } from './dto/signup-user.dto';
 import { ResponseSignupDto } from './dto/signup-response.dto';
+import { AuthGuard } from './auth.guard';
+import { Request } from 'express';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -43,7 +45,7 @@ export class AuthController {
     description: "Login with user's login and password",
   })
   @ApiOkResponse({
-    description: 'Access token',
+    description: 'Access and refresh token',
     type: ResponseLoginDto,
   })
   @ApiForbiddenResponse({ description: 'Incorrect login or password' })
@@ -85,6 +87,32 @@ export class AuthController {
         signupUserDto.login,
         signupUserDto.password,
       );
+      logResponse(this.logging);
+      return response;
+    } catch (err) {
+      if (err instanceof InvalidCredentials) {
+        throw new ForbiddenException(err.message);
+      }
+      throw err;
+    }
+  }
+
+  @Post('refresh')
+  @ApiBearerAuth()
+  @HttpCode(200)
+  @ApiOperation({
+    summary: 'Get fresh access token',
+    description: 'Get fresh access token',
+  })
+  @ApiOkResponse({
+    description: 'Access and refresh tokens',
+    type: ResponseLoginDto,
+  })
+  async refresh(@Req() req: Request) {
+    logRequest(this.logging, req);
+    console.log(req.headers.authorization);
+    try {
+      const response = await this.authService.refresh(req);
       logResponse(this.logging);
       return response;
     } catch (err) {

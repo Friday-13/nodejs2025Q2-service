@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import { LoggingService } from './logging.service';
 
 export function logRequest(logger: LoggingService, req: Request) {

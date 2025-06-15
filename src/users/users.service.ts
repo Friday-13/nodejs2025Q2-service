@@ -18,7 +18,6 @@ export class UsersService {
 
   async create(dto: CreateUserDto): Promise<ResponseUserDto> {
     const salt = Number(this.configService.get('CRYPT_SALT')) || 10;
-    console.log(salt);
     const hashedPassword = await bcrypt.hash(dto.password, salt);
     const user = await this.storage.create({
       ...dto,

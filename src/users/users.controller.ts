@@ -34,6 +34,7 @@ import { User } from './entities/user.entity';
 import { LoggingService } from 'src/logging/logging.service';
 import { logRequest, logResponse } from 'src/logging/endpoint-logs.util';
 import RecordAlreadyExists from 'src/errors/record-already-exists.error';
+import { Request } from 'express';
 
 @ApiTags('Users')
 @ApiBearerAuth()
