@@ -8,11 +8,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { logRequest, logResponse } from 'src/logging/endpoint-logs.util';
 import { AuthService } from './auth.service';
@@ -27,6 +29,7 @@ import { ResponseSignupDto } from './dto/signup-response.dto';
 import { Request } from 'express';
 import { RefreshDto } from './dto/refresh.dto';
 import { JsonWebTokenError } from 'jsonwebtoken';
+import TokenMissed from './errors/token-missed.error';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -48,6 +51,9 @@ export class AuthController {
   @ApiOkResponse({
     description: 'Access and refresh token',
     type: ResponseLoginDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'No login or password, or they are not a strings',
   })
   @ApiForbiddenResponse({ description: 'Incorrect login or password' })
   async login(@Req() req: Request, @Body() loginUserDto: LoginUserDto) {
@@ -109,6 +115,12 @@ export class AuthController {
     description: 'Access and refresh tokens',
     type: ResponseLoginDto,
   })
+  @ApiUnauthorizedResponse({
+    description: 'Refresh token missing but required',
+  })
+  @ApiForbiddenResponse({
+    description: 'Refresh token is invalid or expired',
+  })
   async refresh(@Req() req: Request, @Body() refreshDto: RefreshDto) {
     logRequest(this.logging, req);
     try {
@@ -116,7 +128,7 @@ export class AuthController {
       logResponse(this.logging);
       return response;
     } catch (err) {
-      if (err instanceof InvalidCredentials) {
+      if (err instanceof TokenMissed) {
         throw new UnauthorizedException(err.message);
       }
       if (err instanceof JsonWebTokenError) {

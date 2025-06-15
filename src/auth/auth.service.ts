@@ -8,14 +8,15 @@ import { ResponseSignupDto } from './dto/signup-response.dto';
 import * as bcrypt from 'bcrypt';
 import { IBaseTokenPayload } from './token.interface';
 import { RefreshDto } from './dto/refresh.dto';
-import { ConfigService } from '@nestjs/config';
+import { TokenService } from './token.service';
+import TokenMissed from './errors/token-missed.error';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
-    private configService: ConfigService,
+    private tokenService: TokenService,
   ) {}
   async login(login: string, password: string): Promise<ResponseLoginDto> {
     const user = await this.userService.getByLogin(login);
@@ -23,19 +24,10 @@ export class AuthService {
     if (!isPasswordsMatch) {
       throw new InvalidCredentials();
     }
-    const accessPayload: IBaseTokenPayload = {
-      userId: user.id,
-      login: user.login,
-    };
-    const refreshPayload: IBaseTokenPayload = {
-      userId: user.id,
-      login: user.login,
-    };
+    const payload = this.tokenService.generatePayload(user);
     return {
-      accessToken: await this.jwtService.signAsync(accessPayload),
-      refreshToken: await this.jwtService.signAsync(refreshPayload, {
-        expiresIn: this.configService.get('TOKEN_REFRESH_EXPIRE_TIME') || '24h',
-      }),
+      accessToken: await this.tokenService.getAccessToken(payload),
+      refreshToken: await this.tokenService.getRefreshToken(payload),
     };
   }
 
@@ -54,28 +46,16 @@ export class AuthService {
   async refresh(refreshDto: RefreshDto) {
     const token = refreshDto.refreshToken;
     if (!token) {
-      throw new InvalidCredentials();
+      throw new TokenMissed();
     }
-    const payload = (await this.jwtService.verifyAsync(
-      token,
-    )) as IBaseTokenPayload;
+    const payload = await this.tokenService.verify(token);
 
     const user = await this.userService.getById(payload.userId);
-
-    const accessPayload: IBaseTokenPayload = {
-      userId: user.id,
-      login: user.login,
-    };
-    const refreshPayload: IBaseTokenPayload = {
-      userId: user.id,
-      login: user.login,
-    };
+    const freshPayload = this.tokenService.generatePayload(user);
 
     return {
-      accessToken: await this.jwtService.signAsync(accessPayload),
-      refreshToken: await this.jwtService.signAsync(refreshPayload, {
-        expiresIn: this.configService.get('TOKEN_REFRESH_EXPIRE_TIME') || '24h',
-      }),
+      accessToken: await this.tokenService.getAccessToken(freshPayload),
+      refreshToken: await this.tokenService.getRefreshToken(freshPayload),
     };
   }
 }
