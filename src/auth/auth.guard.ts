@@ -9,12 +9,15 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './public.decorator';
 import { IBaseTokenPayload } from './token.interface';
+import { LoggingService } from 'src/logging/logging.service';
+import { logRequest } from 'src/logging/endpoint-logs.util';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private reflector: Reflector,
+    private loggingService: LoggingService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -29,6 +32,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromRequest(request);
     if (!token) {
+      logRequest(this.loggingService, request);
       throw new UnauthorizedException('Access token missed');
     }
 
