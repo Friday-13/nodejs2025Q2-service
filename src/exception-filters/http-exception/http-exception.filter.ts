@@ -17,6 +17,7 @@ export class HttpExceptionFilter
     super();
   }
   catch(exception: HttpException, host: ArgumentsHost) {
+    console.log('hehehehe');
     const status = exception.getStatus();
     const message = exception.message;
     super.catch(exception, host);

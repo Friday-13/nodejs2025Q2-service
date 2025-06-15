@@ -4,7 +4,6 @@ import {
   ForbiddenException,
   HttpCode,
   Post,
-  Req,
   UnauthorizedException,
 } from '@nestjs/common';
 import {
@@ -16,7 +15,6 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { logRequest, logResponse } from 'src/logging/endpoint-logs.util';
 import { AuthService } from './auth.service';
 import { LoggingService } from 'src/logging/logging.service';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -26,7 +24,6 @@ import { ResponseLoginDto } from './dto/login-response.dto';
 import { Public } from './public.decorator';
 import { SignUpUserDto } from './dto/signup-user.dto';
 import { ResponseSignupDto } from './dto/signup-response.dto';
-import { Request } from 'express';
 import { RefreshDto } from './dto/refresh.dto';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import TokenMissed from './errors/token-missed.error';
@@ -56,14 +53,12 @@ export class AuthController {
     description: 'No login or password, or they are not a strings',
   })
   @ApiForbiddenResponse({ description: 'Incorrect login or password' })
-  async login(@Req() req: Request, @Body() loginUserDto: LoginUserDto) {
-    logRequest(this.logging, req);
+  async login(@Body() loginUserDto: LoginUserDto) {
     try {
       const response = await this.authService.login(
         loginUserDto.login,
         loginUserDto.password,
       );
-      logResponse(this.logging);
       return response;
     } catch (err) {
       if (err instanceof RecordDoesntExist) {
@@ -87,14 +82,12 @@ export class AuthController {
     type: ResponseSignupDto,
   })
   @ApiForbiddenResponse({ description: 'User with this login already exists' })
-  async signup(@Req() req: Request, @Body() signupUserDto: SignUpUserDto) {
-    logRequest(this.logging, req);
+  async signup(@Body() signupUserDto: SignUpUserDto) {
     try {
       const response = await this.authService.signup(
         signupUserDto.login,
         signupUserDto.password,
       );
-      logResponse(this.logging);
       return response;
     } catch (err) {
       if (err instanceof InvalidCredentials) {
@@ -121,11 +114,9 @@ export class AuthController {
   @ApiForbiddenResponse({
     description: 'Refresh token is invalid or expired',
   })
-  async refresh(@Req() req: Request, @Body() refreshDto: RefreshDto) {
-    logRequest(this.logging, req);
+  async refresh(@Body() refreshDto: RefreshDto) {
     try {
       const response = await this.authService.refresh(refreshDto);
-      logResponse(this.logging);
       return response;
     } catch (err) {
       if (err instanceof TokenMissed) {

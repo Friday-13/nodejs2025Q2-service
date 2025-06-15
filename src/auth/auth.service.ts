@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import InvalidCredentials from './errors/invalid-credentials.error';
-import { JwtService } from '@nestjs/jwt';
 import { ResponseLoginDto } from './dto/login-response.dto';
 import LoginAlreadyExists from 'src/users/errors/login-already-exists.error';
 import { ResponseSignupDto } from './dto/signup-response.dto';
 import * as bcrypt from 'bcrypt';
-import { IBaseTokenPayload } from './token.interface';
 import { RefreshDto } from './dto/refresh.dto';
 import { TokenService } from './token.service';
 import TokenMissed from './errors/token-missed.error';
@@ -15,7 +13,6 @@ import TokenMissed from './errors/token-missed.error';
 export class AuthService {
   constructor(
     private userService: UsersService,
-    private jwtService: JwtService,
     private tokenService: TokenService,
   ) {}
   async login(login: string, password: string): Promise<ResponseLoginDto> {
