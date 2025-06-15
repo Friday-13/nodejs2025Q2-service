@@ -31,12 +31,7 @@ import TokenMissed from './errors/token-missed.error';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private logging: LoggingService,
-  ) {
-    this.logging.setContext('Users');
-  }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('login')
   @Public()

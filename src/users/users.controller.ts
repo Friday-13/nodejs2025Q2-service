@@ -33,12 +33,10 @@ import {
 import { User } from './entities/user.entity';
 import { LoggingService } from 'src/logging/logging.service';
 import RecordAlreadyExists from 'src/errors/record-already-exists.error';
-import { LoggingInterceptor } from 'src/logging/logging.interceptor';
 
 @ApiTags('Users')
 @ApiBearerAuth()
 @Controller('user')
-@UseInterceptors(LoggingInterceptor)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
