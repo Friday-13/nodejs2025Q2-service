@@ -8,12 +8,14 @@ import { ResponseSignupDto } from './dto/signup-response.dto';
 import * as bcrypt from 'bcrypt';
 import { IBaseTokenPayload } from './token.interface';
 import { RefreshDto } from './dto/refresh.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
   async login(login: string, password: string): Promise<ResponseLoginDto> {
     const user = await this.userService.getByLogin(login);
@@ -32,8 +34,7 @@ export class AuthService {
     return {
       accessToken: await this.jwtService.signAsync(accessPayload),
       refreshToken: await this.jwtService.signAsync(refreshPayload, {
-        //TODO: load this from env
-        expiresIn: '24h',
+        expiresIn: this.configService.get('TOKEN_REFRESH_EXPIRE_TIME') || '24h',
       }),
     };
   }
@@ -73,8 +74,7 @@ export class AuthService {
     return {
       accessToken: await this.jwtService.signAsync(accessPayload),
       refreshToken: await this.jwtService.signAsync(refreshPayload, {
-        //TODO: load this from env
-        expiresIn: '24h',
+        expiresIn: this.configService.get('TOKEN_REFRESH_EXPIRE_TIME') || '24h',
       }),
     };
   }
