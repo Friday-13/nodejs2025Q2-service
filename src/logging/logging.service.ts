@@ -9,13 +9,19 @@ export class LoggingService extends ConsoleLogger implements LoggerService {
   private logFilePostfix: string;
   private logFileSize: number;
   private logMode: 'file' | 'console';
+  private logFileRotation: number;
   constructor(private configService: ConfigService) {
     super();
+
     const envFileSize: string =
       this.configService.get('LOG_FILE_SIZE_KB') || '10';
     this.logFileSize = parseFloat(envFileSize) * 1024;
+
     const envMode = this.configService.get('LOG_MODE');
     this.logMode = envMode === 'file' ? 'file' : 'console';
+
+    const rotationEnv = this.configService.get('LOG_FILE_ROTATE_NUMBER');
+    this.logFileRotation = rotationEnv ? Number(rotationEnv) : 3;
   }
 
   log(message: any, ...optionalParams: any[]) {
@@ -62,8 +68,19 @@ export class LoggingService extends ConsoleLogger implements LoggerService {
         throw err;
       });
       if (fileStat.size + messageSize > this.logFileSize) {
-        console.log('Creating new file');
         this.logFilePostfix = Date.now() + '-' + randomUUID().slice(0, 5);
+        const fileList = (await fs.readdir('/usr/app/logs')).sort();
+        if (fileList.length >= this.logFileRotation) {
+          const fileToRemove = fileList.slice(
+            0,
+            fileList.length - this.logFileRotation + 1,
+          );
+          fileToRemove.forEach(
+            async (fileName) => await fs.rm(`/usr/app/logs/${fileName}`),
+          );
+        }
+        const newfileList = (await fs.readdir('/usr/app/logs')).sort();
+        console.log(newfileList);
       }
       await fs.appendFile(this.logFilePath, message + '\n');
     }
