@@ -25,7 +25,7 @@ cd <dir-name>
 ### 3. Check out the branch with the containerization task:
 
 ```shell
-git checkout containerization-database-orm
+git checkout logging-error-handling-auth
 ```
 
 ### 4. Istall dependencies:
@@ -70,36 +70,29 @@ After starting the app on port (4000 as default)
 
 After application running open new terminal and enter:
 
-To run all tests without authorization
+To run all test with authorization
 
 ```
-npm run test
+npm run test:auth
 ```
 
-To run only one of all test suites
+To run only specific test suite with authorization
 
 ```
-npm run test -- <path to suite>
+npm run test:auth -- <path to suite>
 ```
 
-<!-- To run all test with authorization -->
-<!---->
-<!-- ``` -->
-<!-- npm run test:auth -->
-<!-- ``` -->
-<!---->
-<!-- To run only specific test suite with authorization -->
-<!---->
-<!-- ``` -->
-<!-- npm run test:auth -- <path to suite> -->
-<!-- ``` -->
+To run refresh tests with authorization
+
+```
+npm run test:refresh
+```
 
 ### Scan the image for security vulnerabilities
 
 ```shell
 npm run docker:scan
 ```
-
 
 ### Auto-fix and format
 
@@ -110,3 +103,16 @@ npm run lint
 ```
 npm run format
 ```
+
+## Configs
+
+### Environment Variables for Logging
+
+| Variable                 | Type   | Values / Format               | Description                                                                                                                                                                 |
+| ------------------------ | ------ | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LOG_MODE`               | string | `console` \| `file` \| `both` | Logging mode: to console only, to file only, or both.                                                                                                                       |
+| `LOG_LEVEL`              | number | `1`–`7`                       | Logging level (by priority):<br>1 = Fatal, 2 = Error, 3 = Warn, 4 = Log, 5 = Info, 6 = Debug, 7 = Verbose.<br>All levels **equal to or higher in priority** will be logged. |
+| `LOG_DIR`                | path   | directory path                | Directory for storing all logs.                                                                                                                                             |
+| `ERROR_DIR`              | path   | directory path                | Directory for storing error logs                                                                                                                                            |
+| `LOG_FILE_SIZE_KB`       | number | ≥ 5                           | Maximum size of a single log file in kilobytes. Recommended: ≥ 5 KB.                                                                                                        |
+| `LOG_FILE_ROTATE_NUMBER` | number | ≥ 1                           | Number of rotated log files to keep. Older files will be deleted.                                                                                                           |
