@@ -9,6 +9,9 @@ export class LoggingService extends ConsoleLogger implements LoggerService {
   private logDir: string;
   private logFileName = 'my-log';
   private logFilePostfix: string;
+  private logFileSequece: number;
+  private logFileTimeStamp: number;
+
   private logFileSize: number;
   private logMode: 'file' | 'console';
   private logFileRotation: number;
@@ -64,34 +67,64 @@ export class LoggingService extends ConsoleLogger implements LoggerService {
       console.log(message);
     } else {
       if (!this.logFilePostfix) {
-        this.logFilePostfix = Date.now() + '-' + randomUUID().slice(0, 5);
+        await this.generateNewPostfix();
       }
 
       const messageSize = Buffer.byteLength(message + '\n', 'utf-8');
-      const fileStat = await fs.stat(this.logFilePath).catch(async (err) => {
-        if (err.code === 'ENOENT') {
-          await fs.appendFile(this.logFilePath, '');
-          return { size: 0 };
-        }
-        throw err;
-      });
-      if (fileStat.size + messageSize > this.logFileSize) {
-        this.logFilePostfix = Date.now() + '-' + randomUUID().slice(0, 5);
-        const fileList = (await fs.readdir(this.logDir)).sort();
-        if (fileList.length >= this.logFileRotation) {
-          const fileToRemove = fileList.slice(
-            0,
-            fileList.length - this.logFileRotation + 1,
-          );
-          fileToRemove.forEach(async (fileName) => {
-            const filePath = path.join(this.logDir, fileName);
-            await fs.rm(filePath);
-          });
-        }
-        const newfileList = (await fs.readdir(this.logDir)).sort();
-        console.log(newfileList);
+      const fileSize = await this.getLogFileSize();
+
+      if (fileSize + messageSize > this.logFileSize) {
+        await this.generateNewPostfix();
       }
+      await this.rotateLogs();
       await fs.appendFile(this.logFilePath, message + '\n');
+    }
+  }
+
+  private async getLogFileSize() {
+    if (await this.isLogFileExists()) {
+      const { size } = await fs.stat(this.logFilePath);
+      return size;
+    }
+    return 0;
+  }
+
+  private async isLogFileExists() {
+    try {
+      await fs.stat(this.logFilePath);
+      return true;
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return false;
+      }
+      throw err;
+    }
+  }
+
+  private async generateNewPostfix() {
+    const timestamp = Date.now();
+    if (timestamp !== this.logFileTimeStamp) {
+      this.logFileTimeStamp = timestamp;
+      this.logFileSequece = 0;
+    } else {
+      this.logFileSequece += 0;
+    }
+
+    this.logFilePostfix =
+      this.logFileTimeStamp + '-' + `${this.logFileSequece}`.padStart(4, '0');
+  }
+
+  private async rotateLogs() {
+    const fileList = (await fs.readdir(this.logDir)).sort();
+    if (fileList.length > this.logFileRotation) {
+      const fileToRemove = fileList.slice(
+        0,
+        fileList.length - this.logFileRotation,
+      );
+      fileToRemove.forEach(async (fileName) => {
+        const filePath = path.join(this.logDir, fileName);
+        await fs.rm(filePath);
+      });
     }
   }
 }
