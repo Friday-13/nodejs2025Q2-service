@@ -11,8 +11,9 @@ import { LoggingService } from './logging/logging.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: new LoggingService(),
+    bufferLogs: true,
   });
+  app.useLogger(app.get(LoggingService));
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
