@@ -5,7 +5,6 @@ import * as path from 'node:path';
 
 @Injectable()
 export class FileLoggingService {
-  private logDir: string;
   private logFilePostfix: string;
   private logFileSequece: number;
   private logFileTimeStamp: number;
@@ -16,11 +15,9 @@ export class FileLoggingService {
   constructor(
     private logFileName: string,
     private logFileExt: string,
+    private logDir: string,
     private configService: ConfigService,
   ) {
-    const envLogDir = this.configService.get('LOG_DIR') || './logs';
-    this.logDir = envLogDir;
-
     const envFileSize: string =
       this.configService.get('LOG_FILE_SIZE_KB') || '10';
     this.logFileSize = parseFloat(envFileSize) * 1024;

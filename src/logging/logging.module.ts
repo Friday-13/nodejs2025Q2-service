@@ -15,14 +15,30 @@ import { FileLoggingService } from './file-logging.service';
     {
       provide: 'COMMON_FILE_LOGGING',
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) =>
-        new FileLoggingService('home_library', 'log', configService),
+      useFactory: (configService: ConfigService) => {
+        const envLogDir = configService.get('LOG_DIR') || './logs';
+        const logDir = envLogDir;
+        return new FileLoggingService(
+          'home_library',
+          'log',
+          logDir,
+          configService,
+        );
+      },
     },
     {
       provide: 'ERROR_FILE_LOGGING',
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) =>
-        new FileLoggingService('home_library', 'err', configService),
+      useFactory: (configService: ConfigService) => {
+        const envErrDir = configService.get('ERROR_DIR') || './errors';
+        const errDir = envErrDir;
+        return new FileLoggingService(
+          'home_library',
+          'err',
+          errDir,
+          configService,
+        );
+      },
     },
   ],
   exports: [LoggingService],

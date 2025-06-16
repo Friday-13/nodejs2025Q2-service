@@ -53,6 +53,7 @@ export class UsersController {
   })
   async getAll() {
     const res = await this.usersService.findAll();
+    throw new Error('hehehe');
     return res;
   }
 
