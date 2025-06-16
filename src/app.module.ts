@@ -9,16 +9,22 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import configs from './configs';
+import { LoggingModule } from './logging/logging.module';
+import { ExceptionFiltersModule } from './exception-filters/exception-filters.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ load: [configs], isGlobal: true }),
+    LoggingModule,
+    AuthModule,
     UsersModule,
     TracksModule,
     ArtistsModule,
     AlbumsModule,
     FavoritesModule,
     PrismaModule,
+    ExceptionFiltersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

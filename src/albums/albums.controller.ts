@@ -16,6 +16,7 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -27,6 +28,7 @@ import {
 import { Album } from './entities/album.entity';
 
 @ApiTags('Albums')
+@ApiBearerAuth()
 @Controller('album')
 export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}

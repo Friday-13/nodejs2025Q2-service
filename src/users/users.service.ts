@@ -5,15 +5,26 @@ import { IUserStorage } from './interfaces/user-storage.interface';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { UserDoesntExist } from './errors/user-doesnt-exist.error';
 import InvalidCredentials from './errors/invalid-credentials.error';
+import LoginAlreadyExists from './errors/login-already-exists.error';
+import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject('IUserStorage') private storage: IUserStorage) {}
+  constructor(
+    @Inject('IUserStorage') private storage: IUserStorage,
+    private configService: ConfigService,
+  ) {}
 
   async create(dto: CreateUserDto): Promise<ResponseUserDto> {
-    const user = await this.storage.create(dto);
+    const salt = Number(this.configService.get('CRYPT_SALT')) || 10;
+    const hashedPassword = await bcrypt.hash(dto.password, salt);
+    const user = await this.storage.create({
+      ...dto,
+      password: hashedPassword,
+    });
     if (!user) {
-      return null;
+      throw new LoginAlreadyExists(dto.login);
     }
     const withoutPasswordUser: ResponseUserDto = {
       id: user.id,
@@ -37,12 +48,24 @@ export class UsersService {
     return user;
   }
 
+  async getByLogin(login: string) {
+    const user = await this.storage.getByLogin(login);
+    if (!user) {
+      throw new UserDoesntExist(login, 'login');
+    }
+    return user;
+  }
+
   async update(id: string, updatePasswordDto: UpdatePasswordDto) {
     const user = await this.storage.getById(id);
     if (!user) {
       throw new UserDoesntExist(id);
     }
-    if (user.password !== updatePasswordDto.oldPassword) {
+    const isPasswordsMatch = await bcrypt.compare(
+      updatePasswordDto.oldPassword,
+      user.password,
+    );
+    if (!isPasswordsMatch) {
       throw new InvalidCredentials('Old password');
     }
     const updatedUser = await this.storage.update(id, updatePasswordDto);

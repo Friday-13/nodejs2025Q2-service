@@ -1,5 +1,5 @@
 export default class RecordDoesntExist extends Error {
-  constructor(entity: string, id: string) {
-    super(`${entity} with id ${id} doesn't exist`);
+  constructor(entity: string, fieldValue: string, fieldName: string = 'id') {
+    super(`${entity} with ${fieldName} ${fieldValue} doesn't exist`);
   }
 }

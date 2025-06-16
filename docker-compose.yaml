@@ -7,7 +7,8 @@ services:
       - ${PORT}:${PORT}
     restart: on-failure
     volumes:
-      - logs:/usr/app/logs
+      - logs:${LOG_DIR}
+      - errors:${ERROR_DIR}
     develop:
       watch:
         - action: sync
@@ -19,6 +20,8 @@ services:
       - db
     environment:
       PORT: ${PORT}
+      LOG_DIR: ${LOG_DIR}
+      ERROR_DIR: ${ERROR_DIR}
 
   db:
     image: postgres
@@ -44,3 +47,4 @@ networks:
 volumes:
   library-data:
   logs:
+  errors:

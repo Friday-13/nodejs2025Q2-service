@@ -10,6 +10,7 @@ import {
   NotFoundException,
   HttpCode,
   ForbiddenException,
+  ConflictException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,6 +19,7 @@ import { UserDoesntExist } from './errors/user-doesnt-exist.error';
 import InvalidCredentials from './errors/invalid-credentials.error';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNoContentResponse,
@@ -28,11 +30,19 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
+import { LoggingService } from 'src/logging/logging.service';
+import RecordAlreadyExists from 'src/errors/record-already-exists.error';
 
 @ApiTags('Users')
+@ApiBearerAuth()
 @Controller('user')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private logging: LoggingService,
+  ) {
+    this.logging.setContext('Users');
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get all users', description: 'Gets all users' })
@@ -42,7 +52,8 @@ export class UsersController {
     isArray: true,
   })
   async getAll() {
-    return await this.usersService.findAll();
+    const res = await this.usersService.findAll();
+    return res;
   }
 
   @Post()
@@ -55,7 +66,15 @@ export class UsersController {
     description: 'Bad request. body does not contain required fields',
   })
   async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.create(createUserDto);
+    try {
+      const res = await this.usersService.create(createUserDto);
+      return res;
+    } catch (err) {
+      if (err instanceof RecordAlreadyExists) {
+        throw new ConflictException(err.message);
+      }
+      throw err;
+    }
   }
 
   @Get(':id')
@@ -80,6 +99,7 @@ export class UsersController {
       if (err instanceof UserDoesntExist) {
         throw new NotFoundException(err.message);
       }
+      throw err;
     }
   }
 
@@ -105,8 +125,8 @@ export class UsersController {
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
     try {
-      const user = await this.usersService.update(id, updatePasswordDto);
-      return user;
+      const response = await this.usersService.update(id, updatePasswordDto);
+      return response;
     } catch (err) {
       if (err instanceof UserDoesntExist) {
         throw new NotFoundException(err.message);

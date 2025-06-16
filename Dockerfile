@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 4000
 
-CMD npx prisma generate && npm run start:dev > logs/api.logs 2>&1
+CMD npx prisma generate && npm run start:dev
