@@ -16,7 +16,6 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { LoggingService } from 'src/logging/logging.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import RecordDoesntExist from 'src/errors/record-doesnt-exist.error';
 import InvalidCredentials from './errors/invalid-credentials.error';

@@ -45,6 +45,5 @@ async function bootstrap() {
   });
   const port = configService.get('PORT');
   await app.listen(port);
-  throw new Error('Hehehe error');
 }
 bootstrap();

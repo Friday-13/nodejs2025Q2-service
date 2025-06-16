@@ -9,7 +9,7 @@ import { FileLoggingService } from './file-logging.service';
 
 @Injectable()
 export class LoggingService extends ConsoleLogger implements LoggerService {
-  private logMode: 'file' | 'console';
+  private logMode: 'file' | 'console' | 'both';
   private logLevel: number;
   constructor(
     private configService: ConfigService,
@@ -20,8 +20,11 @@ export class LoggingService extends ConsoleLogger implements LoggerService {
   ) {
     super();
     const envMode = this.configService.get('LOG_MODE');
-    this.logMode = envMode === 'file' ? 'file' : 'console';
-
+    console.log(envMode);
+    this.logMode = ['file', 'console', 'both'].includes(envMode)
+      ? envMode
+      : 'console';
+    console.log(envMode);
     const logLevelEnv = this.configService.get('LOG_LEVEL');
     this.logLevel = isNaN(logLevelEnv) ? 6 : Number(logLevelEnv);
   }
@@ -63,13 +66,14 @@ export class LoggingService extends ConsoleLogger implements LoggerService {
   }
 
   private async print(message: string, isError: boolean = false) {
-    if (this.logMode === 'console') {
-      console.log(message);
-    } else {
+    if (this.logMode === 'file' || this.logMode === 'both') {
       await this.commonFileLogging.print(message);
       if (isError) {
         await this.errorFileLogging.print(message);
       }
+    }
+    if (this.logMode === 'console' || this.logMode === 'both') {
+      console.log(message);
     }
   }
 }
