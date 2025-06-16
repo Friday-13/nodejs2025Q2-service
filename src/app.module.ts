@@ -8,7 +8,6 @@ import { AlbumsModule } from './albums/albums.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
-import { LoggingService } from './logging/logging.service';
 import configs from './configs';
 import { LoggingModule } from './logging/logging.module';
 import { ExceptionFiltersModule } from './exception-filters/exception-filters.module';
@@ -28,6 +27,6 @@ import { AuthModule } from './auth/auth.module';
     ExceptionFiltersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, LoggingService],
+  providers: [AppService],
 })
 export class AppModule {}

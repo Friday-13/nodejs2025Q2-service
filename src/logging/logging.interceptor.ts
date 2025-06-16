@@ -22,7 +22,7 @@ export class LoggingInterceptor implements NestInterceptor {
         logResponse(
           this.loggingService,
           response.statusCode,
-          JSON.stringify(data),
+          // JSON.stringify(data),
         );
         return data;
       }),
