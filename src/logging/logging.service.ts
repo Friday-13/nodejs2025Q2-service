@@ -26,7 +26,7 @@ export class LoggingService extends ConsoleLogger implements LoggerService {
       : 'console';
     console.log(envMode);
     const logLevelEnv = this.configService.get('LOG_LEVEL');
-    this.logLevel = isNaN(logLevelEnv) ? 6 : Number(logLevelEnv);
+    this.logLevel = isNaN(logLevelEnv) ? 5 : Number(logLevelEnv);
   }
 
   fatal(message: any, ...optionalParams: any[]) {
