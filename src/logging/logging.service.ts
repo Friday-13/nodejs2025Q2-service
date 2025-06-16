@@ -28,37 +28,37 @@ export class LoggingService extends ConsoleLogger implements LoggerService {
 
   fatal(message: any, ...optionalParams: any[]) {
     if (this.logLevel >= 0) {
-      this.print(`My Fatal: ${message}; ${optionalParams}`);
+      this.print(`My Fatal: ${message}; ${optionalParams}`, true);
     }
   }
 
   error(message: any, ...optionalParams: any[]) {
     if (this.logLevel >= 1) {
-      this.print(`My Error: ${message}; ${optionalParams}`, true);
+      this.print(`My Error:${message}; ${optionalParams}`, true);
     }
   }
 
   warn(message: any, ...optionalParams: any[]) {
     if (this.logLevel >= 2) {
-      this.print(`My Warn: ${message}; ${optionalParams}`);
+      this.print(`My Warn:${message}; ${optionalParams}`);
     }
   }
 
   log(message: any, ...optionalParams: any[]) {
     if (this.logLevel >= 3) {
-      this.print(`My Log: ${message}; ${optionalParams}`);
+      this.print(`My Log:${message}; ${optionalParams}`);
     }
   }
 
   debug(message: any, ...optionalParams: any[]) {
     if (this.logLevel >= 4) {
-      this.print(`My Debug: ${message}; ${optionalParams}`);
+      this.print(`My Debug:${message}; ${optionalParams}`);
     }
   }
 
   verbose(message: any, ...optionalParams: any[]) {
     if (this.logLevel >= 5) {
-      this.print(`My Verbose: ${message}; ${optionalParams}`);
+      this.print(`My Verbose:${message}; ${optionalParams}`);
     }
   }
 

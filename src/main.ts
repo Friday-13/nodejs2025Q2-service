@@ -34,7 +34,17 @@ async function bootstrap() {
   SwaggerModule.setup('doc', app, documentFactory);
 
   const configService = app.get(ConfigService);
+  const loggingService = app.get(LoggingService);
+
+  process.on('uncaughtException', async (err) => {
+    loggingService.fatal(err);
+  });
+
+  process.on('unhandledRejection', async (err) => {
+    loggingService.error(err);
+  });
   const port = configService.get('PORT');
   await app.listen(port);
+  throw new Error('Hehehe error');
 }
 bootstrap();
