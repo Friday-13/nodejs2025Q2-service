@@ -108,11 +108,42 @@ npm run format
 
 ### Environment Variables for Logging
 
-| Variable                 | Type   | Values / Format               | Description                                                                                                                                                                 |
-| ------------------------ | ------ | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `LOG_MODE`               | string | `console` \| `file` \| `both` | Logging mode: to console only, to file only, or both.                                                                                                                       |
-| `LOG_LEVEL`              | number | `0`–`5`                       | Logging level (by priority):<br>0 = Fatal, 1 = Error, 2 = Warn, 3 = Log,  4 = Debug, 5 = Verbose.<br>All levels **equal to or higher in priority** will be logged. |
-| `LOG_DIR`                | path   | directory path                | Directory for storing all logs.                                                                                                                                             |
-| `ERROR_DIR`              | path   | directory path                | Directory for storing error logs                                                                                                                                            |
-| `LOG_FILE_SIZE_KB`       | number | ≥ 5                           | Maximum size of a single log file in kilobytes. Recommended: ≥ 5 KB.                                                                                                        |
-| `LOG_FILE_ROTATE_NUMBER` | number | ≥ 1                           | Number of rotated log files to keep. Older files will be deleted.                                                                                                           |
+| Variable                 | Type   | Values / Format               | Description                                                                                                                                                       |
+| ------------------------ | ------ | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LOG_MODE`               | string | `console` \| `file` \| `both` | Logging mode: to console only, to file only, or both.                                                                                                             |
+| `LOG_LEVEL`              | number | `0`–`5`                       | Logging level (by priority):<br>0 = Fatal, 1 = Error, 2 = Warn, 3 = Log, 4 = Debug, 5 = Verbose.<br>All levels **equal to or higher in priority** will be logged. |
+| `LOG_DIR`                | path   | directory path                | Directory for storing all logs.                                                                                                                                   |
+| `ERROR_DIR`              | path   | directory path                | Directory for storing error logs                                                                                                                                  |
+| `LOG_FILE_SIZE_KB`       | number | ≥ 5                           | Maximum size of a single log file in kilobytes. Recommended: ≥ 5 KB.                                                                                              |
+| `LOG_FILE_ROTATE_NUMBER` | number | ≥ 1                           | Number of rotated log files to keep. Older files will be deleted.                                                                                                 |
+
+## How to View Logs in Docker Container
+
+1. List available log files
+
+```shell
+docker exec -it <container-name> ls -lh /usr/app/logs/
+```
+
+This will display a list of log files along with their sizes.
+
+> Replace <container-name> with the actual container name, for example: `home-library-api-1`.
+
+2. Read a specific log file
+
+```shell
+docker exec -it <container-name> cat /usr/app/logs/<file-name>.log
+```
+
+> Example:
+>
+> ```shell
+> docker exec -it home-library-api-1 cat /usr/app/logs/home_library-1750108833282-0000.log
+> ```
+
+3. To read error logs
+Change the path from `/usr/app/logs/` to `/usr/app/errors/` (or use the value from your `.env` if it's different):
+
+```shell
+docker exec -it <container-name> cat /usr/app/errors/<file-name>.err
+```
