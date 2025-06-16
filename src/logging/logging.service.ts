@@ -2,9 +2,11 @@ import { ConsoleLogger, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 
 @Injectable()
 export class LoggingService extends ConsoleLogger implements LoggerService {
+  private logDir: string;
   private logFileName = 'my-log';
   private logFilePostfix: string;
   private logFileSize: number;
@@ -12,6 +14,9 @@ export class LoggingService extends ConsoleLogger implements LoggerService {
   private logFileRotation: number;
   constructor(private configService: ConfigService) {
     super();
+
+    const envLogDir = this.configService.get('LOG_DIR') || './logs';
+    this.logDir = envLogDir;
 
     const envFileSize: string =
       this.configService.get('LOG_FILE_SIZE_KB') || '10';
@@ -48,7 +53,10 @@ export class LoggingService extends ConsoleLogger implements LoggerService {
   }
 
   private get logFilePath() {
-    return `/usr/app/logs/${this.logFileName}-${this.logFilePostfix}.log`;
+    return path.join(
+      this.logDir,
+      `${this.logFileName}-${this.logFilePostfix}.log`,
+    );
   }
 
   private async print(message: string) {
@@ -69,17 +77,18 @@ export class LoggingService extends ConsoleLogger implements LoggerService {
       });
       if (fileStat.size + messageSize > this.logFileSize) {
         this.logFilePostfix = Date.now() + '-' + randomUUID().slice(0, 5);
-        const fileList = (await fs.readdir('/usr/app/logs')).sort();
+        const fileList = (await fs.readdir(this.logDir)).sort();
         if (fileList.length >= this.logFileRotation) {
           const fileToRemove = fileList.slice(
             0,
             fileList.length - this.logFileRotation + 1,
           );
-          fileToRemove.forEach(
-            async (fileName) => await fs.rm(`/usr/app/logs/${fileName}`),
-          );
+          fileToRemove.forEach(async (fileName) => {
+            const filePath = path.join(this.logDir, fileName);
+            await fs.rm(filePath);
+          });
         }
-        const newfileList = (await fs.readdir('/usr/app/logs')).sort();
+        const newfileList = (await fs.readdir(this.logDir)).sort();
         console.log(newfileList);
       }
       await fs.appendFile(this.logFilePath, message + '\n');
